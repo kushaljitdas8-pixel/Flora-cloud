@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flora VPS — Enterprise Cloud & Game Control Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --border: #e2e8f0;
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --primary-light: #d1fae5;
+      --accent: #2563eb;
+      --accent-light: #dbeafe;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 20px 40px -12px rgba(16, 185, 129, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.07) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.45); opacity: 0.55; }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(24px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .animate-fade {
+      animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Custom SVG Brand Logo Styling */
+    .flora-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      transition: transform 0.25s ease;
+    }
+
+    .flora-logo-wrap:hover {
+      transform: translateY(-1px);
+    }
+
+    .flora-logo-svg {
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+
+    .flora-logo-wrap:hover .flora-logo-svg {
+      transform: rotate(-4deg) scale(1.05);
+      filter: drop-shadow(0 8px 16px rgba(16, 185, 129, 0.28));
+    }
+
+    .flora-wordmark {
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    .flora-wordmark span {
+      background: linear-gradient(135deg, var(--primary-dark), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Toast */
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border-left: 4px solid var(--primary);
+      padding: 13px 18px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      font-size: 13.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s ease forwards;
+      border: 1px solid var(--border);
+    }
+
+    .toast.error { border-left-color: var(--danger); }
+
+    /* Auth View */
+    #auth-view {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-card {
+      background: var(--bg-card);
+      width: 100%;
+      max-width: 440px;
+      border-radius: 22px;
+      padding: 38px 34px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      animation: fadeUp 0.5s ease;
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .brand-header .flora-logo-wrap {
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .brand-header h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+    }
+
+    .brand-header p {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--bg-subtle);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+
+    .auth-tab {
+      border: none;
+      background: transparent;
+      padding: 10px;
+      border-radius: 9px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .auth-tab.active {
+      background: var(--bg-card);
+      color: var(--text-main);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-group label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 11px;
+      font-size: 14px;
+      background: var(--bg-main);
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--bg-card);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+    }
+
+    .quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .chip-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .chip-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 11px 17px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13.5px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      width: 100%;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.42);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      color: var(--text-main);
+    }
+
+    .btn-outline:hover { background: var(--bg-subtle); }
+    .btn-success { background: var(--primary); color: white; }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-danger  { background: var(--danger); color: white; }
+    .btn-accent  { background: var(--accent); color: white; }
+
+    /* Navbar */
+    .navbar {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-badge {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-chip {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      padding: 7px 14px;
+      border-radius: 20px;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 26px 20px;
+    }
+
+    .panel-tabs {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-card);
+      padding: 6px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .panel-tab {
+      border: none;
+      background: transparent;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .panel-tab:hover { color: var(--text-main); background: var(--bg-subtle); }
+
+    .panel-tab.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+    @media (max-width: 920px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.25s ease;
+    }
+
+    .card:hover { box-shadow: var(--shadow-md); }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-online { background: #dcfce7; color: #15803d; }
+    .status-offline { background: #fee2e2; color: #b91c1c; }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .status-online .dot { animation: pulseDot 1.5s infinite; }
+
+    .meter-wrap { margin-top: 10px; }
+    .meter-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-subtle);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .meter-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 10px;
+      transition: width 0.6s ease;
+    }
+
+    .console-box {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 14px;
+      padding: 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      height: 340px;
+      overflow-y: auto;
+      line-height: 1.65;
+      border: 1px solid #1e293b;
+    }
+
+    .console-line { margin-bottom: 4px; word-break: break-all; }
+    .console-time { color: #64748b; }
+    .console-info { color: #38bdf8; }
+    .console-ok   { color: #34d399; }
+    .console-warn { color: #fbbf24; }
+    .console-err  { color: #f87171; }
+
+    .console-input-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .console-input {
+      flex: 1;
+      background: var(--bg-subtle);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: var(--bg-main);
+      transition: all 0.2s ease;
+    }
+
+    .file-item:hover {
+      background: var(--bg-subtle);
+      border-color: var(--primary);
+    }
+
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    th, td {
+      text-align: left;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: var(--bg-subtle);
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      text-transform: uppercase;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div id="toast-container"></div>
+
+  <!-- ================= AUTH VIEW (LOGIN / SIGN UP) ================= -->
+  <section id="auth-view">
+    <div class="auth-card">
+      <div class="brand-header">
+        <div class="flora-logo-wrap">
+          <svg class="flora-logo-svg" width="54" height="54" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="floraGradLarge" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#10b981"/>
+                <stop offset="100%" stop-color="#2563eb"/>
+              </linearGradient>
+            </defs>
+            <rect width="64" height="64" rx="18" fill="url(#floraGradLarge)"/>
+            <path d="M21 20H44V26.5H28V30.5H40V37H28V46H21V20Z" fill="#ffffff"/>
+            <circle cx="45" cy="43" r="4.5" fill="#d1fae5"/>
+          </svg>
+        </div>
+        <h1><span class="flora-wordmark" style="font-size:25px;">FLORA <span>VPS</span></span></h1>
+        <p>Next-Gen 24/7 Bare-Metal & Cloud Control Panel</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
+        <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="login-email" class="form-control" placeholder="Enter your email" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In to Panel →</button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="signup-form" class="hidden" onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label>Username / Display Name</label>
+          <input type="text" id="signup-name" class="form-control" placeholder="e.g. Cilogaming80" required />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="signup-email" class="form-control" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signup-password" class="form-control" placeholder="Minimum 6 characters" minlength="6" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Create Account</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= ADMIN PANEL VIEW ================= -->
+  <section id="admin-view" class="hidden">
+    <nav class="navbar">
+      <div class="nav-left">
+        <a href="#" class="flora-logo-wrap" onclick="event.preventDefault()">
+          <svg class="flora-logo-svg" width="38" height="38" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="floraGradAdmin" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#10b981"/>
+                <stop offset="100%" stop-color="#2563eb"/>
+              </linearGradient>
+            </defs>
+            <rect width="64" height="64" rx="18" fill="url(#floraGradAdmin)"/>
+            <path d="M21 20H44V26.5H28V30.5H40V37H28V46H21V20Z" fill="#ffffff"/>
+            <circle cx="45" cy="43" r="4.5" fill="#d1fae5"/>
+          </svg>
+          <span class="flora-wordmark" style="font-size:18px;">FLORA <span>VPS</span></span>
+        </a>
+        <span class="nav-badge">Root Administrator</span>
+      </div>
+      <div class="nav-right">
+        <span class="user-chip" id="admin-email-label">admin@floravps.com</span>
+        <button class="btn btn-outline" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+
+    <div class="container animate-fade">
+      <div class="grid-4" style="margin-bottom: 24px;">
+        <div class="card">
+          <span style="font-size:12px;color:var(--text-muted);font-weight:700;">REGISTERED USERS</span>
+          <h2 id="stat-users" style="font-size:28px;margin-top:6px;">0</h2>
+        </div>
+        <div class="card">
+          <span style="font-size:12px;color:var(--text-muted);font-weight:700;">DEPLOYED VPS NODES</span>
+          <h2 id="stat-vps" style="font-size:28px;margin-top:6px;color:var(--primary-dark);">0</h2>
+        </div>
+        <div class="card">
+          <span style="font-size:12px;color:var(--text-muted);font-weight:700;">CLUSTER NETWORK</span>
+          <h2 style="font-size:28px;margin-top:6px;color:var(--accent);">10 Gbps</h2>
+        </div>
+        <div class="card">
+          <span style="font-size:12px;color:var(--text-muted);font-weight:700;">ANTI-DDOS SHIELD</span>
+          <h2 style="font-size:28px;margin-top:6px;color:var(--primary);">Active 24/7</h2>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Assign / Deploy VPS Form -->
+        <div class="card">
+          <div class="card-title">
+            <span>Provision & Give VPS by Customer Email</span>
+            <span class="nav-badge">Instant Setup</span>
+          </div>
+          <form onsubmit="deployVPS(event)">
+            <div class="form-group">
+              <label>Customer Email Address (Type directly or tap below)</label>
+              <input type="email" id="assign-user-email" class="form-control" placeholder="customer@gmail.com" required />
+              <div id="registered-email-chips" class="quick-chips"></div>
+            </div>
+
+            <div class="grid-2" style="gap:12px;">
+              <div class="form-group">
+                <label>VPS / Server Name</label>
+                <input type="text" id="vps-name" class="form-control" placeholder="e.g. Froxy SMP Dedicated" required />
+              </div>
+              <div class="form-group">
+                <label>Hardware Plan Tier</label>
+                <select id="vps-plan" class="form-control">
+                  <option value="Dirt Plan (2GB RAM / 1 vCPU / 20GB NVMe)">Dirt Plan — 2GB RAM</option>
+                  <option value="Stone Plan (4GB RAM / 2 vCPU / 40GB NVMe)">Stone Plan — 4GB RAM</option>
+                  <option value="Iron Plan (8GB RAM / 4 vCPU / 80GB NVMe)">Iron Plan — 8GB RAM</option>
+                  <option value="Gold Plan (16GB RAM / 6 vCPU / 160GB NVMe)">Gold Plan — 16GB RAM</option>
+                  <option value="Diamond Plan (32GB RAM / 8 vCPU / 320GB NVMe)">Diamond Plan — 32GB RAM</option>
+                  <option value="Netherite Plan (64GB RAM / 16 vCPU / 640GB NVMe)">Netherite Plan — 64GB RAM</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-2" style="gap:12px;">
+              <div class="form-group">
+                <label>Primary IPv4 : Port</label>
+                <input type="text" id="vps-ip" class="form-control" value="in-mum01.floravps.net:25565" required />
+              </div>
+              <div class="form-group">
+                <label>Datacenter Region</label>
+                <select id="vps-region" class="form-control">
+                  <option value="🇮🇳 Mumbai, India (Low Ping)">🇮🇳 Mumbai, India</option>
+                  <option value="🇸🇬 Singapore Asia-Pacific">🇸🇬 Singapore</option>
+                  <option value="🇩🇪 Frankfurt, Germany">🇩🇪 Frankfurt, EU</option>
+                  <option value="🇺🇸 New York, USA">🇺🇸 New York, US</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-2" style="gap:12px;">
+              <div class="form-group">
+                <label>Operating System / Egg</label>
+                <select id="vps-os" class="form-control">
+                  <option value="Ubuntu 24.04 LTS + PaperMC / Geyser">Ubuntu 24.04 + PaperMC/Geyser</option>
+                  <option value="Ubuntu 24.04 LTS (Root KVM)">Ubuntu 24.04 LTS (Root KVM)</option>
+                  <option value="Debian 12 Bookworm Cloud">Debian 12 Bookworm Cloud</option>
+                  <option value="Python 3.12 / Node.js 22 Bot Host">Python / Node.js 24/7 Host</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Uptime SLA</label>
+                <select id="vps-uptime" class="form-control">
+                  <option value="24/7 Always Online">24/7 Always Online</option>
+                  <option value="Dedicated Bare-Metal 24/7">Dedicated Bare-Metal 24/7</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Startup Script / Admin Custom Code (Runs in Customer Console)</label>
+              <textarea id="vps-code" class="form-control" rows="4" style="font-family:'JetBrains Mono',monospace;font-size:12.5px;" placeholder="java -Xms4G -Xmx8G -XX:+UseG1GC -jar server.jar nogui&#10;systemctl enable flora-247-daemon --now"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Deploy VPS & Unlock Customer Panel</button>
+          </form>
+        </div>
+
+        <!-- Active VPS & Customers List -->
+        <div class="card">
+          <div class="card-title">
+            <span>Active VPS Allocations</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer Email</th>
+                  <th>Server & Region</th>
+                  <th>Uptime</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-vps-table">
+                <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No VPS deployed yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-title" style="margin-top:26px;">
+            <span>Registered Customers Directory</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-table">
+                <tr><td colspan="3" style="text-align:center;color:var(--text-muted);">No customers registered yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CUSTOMER PANEL VIEW ================= -->
+  <section id="customer-view" class="hidden">
+    <nav class="navbar">
+      <div class="nav-left">
+        <a href="#" class="flora-logo-wrap" onclick="event.preventDefault()">
+          <svg class="flora-logo-svg" width="38" height="38" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="floraGradCust" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#10b981"/>
+                <stop offset="100%" stop-color="#2563eb"/>
+              </linearGradient>
+            </defs>
+            <rect width="64" height="64" rx="18" fill="url(#floraGradCust)"/>
+            <path d="M21 20H44V26.5H28V30.5H40V37H28V46H21V20Z" fill="#ffffff"/>
+            <circle cx="45" cy="43" r="4.5" fill="#d1fae5"/>
+          </svg>
+          <span class="flora-wordmark" style="font-size:18px;">FLORA <span>VPS</span></span>
+        </a>
+        <span class="nav-badge">Cloud Console</span>
+      </div>
+      <div class="nav-right">
+        <span class="user-chip" id="customer-email-label">user@email.com</span>
+        <button class="btn btn-outline" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+
+    <!-- COMPLETELY BLANK UNTIL ADMIN GRANTS A VPS -->
+    <div class="container animate-fade">
+      <div id="customer-has-vps" class="hidden">
+        
+        <div class="card" style="margin-bottom:18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+              <h2 id="cust-vps-name" style="font-size:22px;">Server Name</h2>
+              <span id="cust-status-pill" class="status-pill status-online">
+                <span class="dot"></span>
+                <span id="cust-status-text">24/7 ONLINE</span>
+              </span>
+              <span class="nav-badge" id="cust-vps-region">🇮🇳 Mumbai</span>
+            </div>
+            <p style="font-size:13px;color:var(--text-muted);">
+              <strong id="cust-vps-plan">-</strong> &nbsp;•&nbsp; 
+              OS: <span id="cust-vps-os">-</span> &nbsp;•&nbsp;
+              IP: <code id="cust-vps-ip" style="background:var(--bg-subtle);padding:3px 8px;border-radius:6px;cursor:pointer;font-weight:600;" onclick="copyText('cust-vps-ip', 'IP Address')">-</code>
+            </p>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-success" onclick="powerAction('start')">▶ Start</button>
+            <button class="btn btn-warning" onclick="powerAction('restart')">↻ Restart</button>
+            <button class="btn btn-danger" onclick="powerAction('stop')">■ Stop</button>
+          </div>
+        </div>
+
+        <div class="panel-tabs">
+          <button class="panel-tab active" onclick="switchPanelTab('console', this)">💻 Console & Metrics</button>
+          <button class="panel-tab" onclick="switchPanelTab('files', this)">📁 File Manager</button>
+          <button class="panel-tab" onclick="switchPanelTab('network', this)">🌐 Ports & Firewall</button>
+          <button class="panel-tab" onclick="switchPanelTab('backups', this)">💾 Backups & Snapshots</button>
+          <button class="panel-tab" onclick="switchPanelTab('startup', this)">⚙️ Startup & SFTP</button>
+        </div>
+
+        <!-- TAB 1: CONSOLE & METRICS -->
+        <div id="subtab-console" class="subtab-view">
+          <div class="grid-4" style="margin-bottom:18px;">
+            <div class="card">
+              <span style="font-size:11.5px;font-weight:700;color:var(--text-muted);">CPU UTILIZATION</span>
+              <h3 id="metric-cpu" style="font-size:22px;margin-top:4px;">12.4%</h3>
+              <div class="meter-wrap"><div class="meter-bar"><div id="bar-cpu" class="meter-fill" style="width:12%;"></div></div></div>
+            </div>
+            <div class="card">
+              <span style="font-size:11.5px;font-weight:700;color:var(--text-muted);">MEMORY ALLOCATION</span>
+              <h3 id="metric-ram" style="font-size:22px;margin-top:4px;">1.9 GB</h3>
+              <div class="meter-wrap"><div class="meter-bar"><div id="bar-ram" class="meter-fill" style="width:30%;"></div></div></div>
+            </div>
+            <div class="card">
+              <span style="font-size:11.5px;font-weight:700;color:var(--text-muted);">NVMe DISK I/O</span>
+              <h3 id="metric-disk" style="font-size:22px;margin-top:4px;">14.2 GB</h3>
+              <div class="meter-wrap"><div class="meter-bar"><div id="bar-disk" class="meter-fill" style="width:22%;"></div></div></div>
+            </div>
+            <div class="card">
+              <span style="font-size:11.5px;font-weight:700;color:var(--text-muted);">NETWORK & UPTIME</span>
+              <h3 id="metric-net" style="font-size:20px;margin-top:4px;color:var(--primary-dark);">24/7 Active</h3>
+              <p id="metric-traffic" style="font-size:12px;color:var(--text-muted);margin-top:8px;">↓ 18.4 MB/s &nbsp; ↑ 9.2 MB/s</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <span>Live Root Terminal Console</span>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-outline" style="padding:5px 11px;font-size:12px;" onclick="runQuickCmd('status')">Check Status</button>
+                <button class="btn btn-outline" style="padding:5px 11px;font-size:12px;" onclick="clearConsole()">Clear</button>
+              </div>
+            </div>
+            <div id="console-output" class="console-box"></div>
+            <form class="console-input-row" onsubmit="sendConsoleCommand(event)">
+              <input type="text" id="console-cmd" class="console-input" placeholder="Enter command (help, status, htop, neofetch, plugins, ping, clear)..." />
+              <button type="submit" class="btn btn-primary" style="width:auto;">Execute</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB 2: FILE MANAGER -->
+        <div id="subtab-files" class="subtab-view hidden">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">
+                <span>/home/container/ (Server Directory)</span>
+                <button class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="createNewFile()">+ New File</button>
+              </div>
+              <div id="file-list-container"></div>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <span id="editor-filename">Select a file to edit</span>
+                <button class="btn btn-accent" style="padding:6px 12px;font-size:12px;" onclick="saveEditedFile()">Save File</button>
+              </div>
+              <textarea id="file-editor-area" class="form-control" rows="13" style="font-family:'JetBrains Mono',monospace;font-size:12.5px;" placeholder="Click 'Edit' on any file from the left list..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: PORTS & FIREWALL -->
+        <div id="subtab-network" class="subtab-view hidden">
+          <div class="card">
+            <div class="card-title">
+              <span>Network Allocations & DDoS Firewall Rules</span>
+              <button class="btn btn-primary" style="width:auto;padding:7px 14px;font-size:12.5px;" onclick="allocateExtraPort()">+ Allocate Additional Port</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>IP Address</th>
+                    <th>Port</th>
+                    <th>Protocol / Service</th>
+                    <th>Firewall Shield</th>
+                  </tr>
+                </thead>
+                <tbody id="ports-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: BACKUPS & SNAPSHOTS -->
+        <div id="subtab-backups" class="subtab-view hidden">
+          <div class="card">
+            <div class="card-title">
+              <span>Automated Cloud Snapshots (NVMe Offsite)</span>
+              <button class="btn btn-primary" style="width:auto;padding:7px 14px;font-size:12.5px;" onclick="createBackup()">+ Create Snapshot Now</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Snapshot Name</th>
+                    <th>Created At</th>
+                    <th>Size</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="backups-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: STARTUP & SFTP -->
+        <div id="subtab-startup" class="subtab-view hidden">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">
+                <span>Admin Startup Command & Script</span>
+                <button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="copyText('cust-startup-code', 'Startup Script')">Copy</button>
+              </div>
+              <pre id="cust-startup-code" style="background:var(--bg-subtle);border:1px solid var(--border);padding:16px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;min-height:200px;white-space:pre-wrap;overflow-x:auto;"></pre>
+            </div>
+
+            <div class="card">
+              <div class="card-title"><span>SFTP & Root SSH Access Details</span></div>
+              <div class="form-group">
+                <label>SFTP Server Address</label>
+                <input type="text" id="sftp-host" class="form-control" readonly />
+              </div>
+              <div class="form-group">
+                <label>SFTP / SSH Username</label>
+                <input type="text" id="sftp-user" class="form-control" readonly />
+              </div>
+              <div class="form-group">
+                <label>Authentication</label>
+                <input type="text" class="form-control" value="Use your Flora VPS Account Password" readonly />
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // ================= ADMIN CREDENTIALS (CHANGE HERE) =================
+    const ADMIN_EMAIL = "admin@floravps.com";
+    const ADMIN_PASS  = "FloraBoss2026";
+
+    const USERS_KEY   = "floravps_users_v3";
+    const VPS_KEY     = "floravps_servers_v3";
+    const SESSION_KEY = "floravps_session_v3";
+
+    let telemetryInterval = null;
+    let currentEditingFile = null;
+
+    function showToast(msg, isError = false) {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      toast.className = "toast" + (isError ? " error" : "");
+      toast.innerHTML = `<span>${isError ? "⚠️" : "✅"}</span><span>${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3400);
+    }
+
+    function getUsers() { return JSON.parse(localStorage.getItem(USERS_KEY) || "[]"); }
+    function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+    function getServers() { return JSON.parse(localStorage.getItem(VPS_KEY) || "{}"); }
+    function saveServers(servers) { localStorage.setItem(VPS_KEY, JSON.stringify(servers)); }
+
+    function switchAuthTab(tab) {
+      document.getElementById("tab-login").classList.toggle("active", tab === "login");
+      document.getElementById("tab-signup").classList.toggle("active", tab === "signup");
+      document.getElementById("login-form").classList.toggle("hidden", tab !== "login");
+      document.getElementById("signup-form").classList.toggle("hidden", tab !== "signup");
+    }
+
+    function handleSignup(e) {
+      e.preventDefault();
+      const name = document.getElementById("signup-name").value.trim();
+      const email = document.getElementById("signup-email").value.trim().toLowerCase();
+      const password = document.getElementById("signup-password").value;
+
+      if (email === ADMIN_EMAIL.toLowerCase()) {
+        showToast("Reserved for Root Administrator.", true);
+        return;
+      }
+
+      const users = getUsers();
+      if (users.some(u => u.email === email)) {
+        showToast("Account already exists! Please login.", true);
+        switchAuthTab("login");
+        return;
+      }
+
+      users.push({ name, email, password, createdAt: new Date().toLocaleDateString() });
+      saveUsers(users);
+      showToast("Account created! Log in now.");
+      document.getElementById("signup-form").reset();
+      switchAuthTab("login");
+      document.getElementById("login-email").value = email;
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim().toLowerCase();
+      const password = document.getElementById("login-password").value;
+
+      if (email === ADMIN_EMAIL.toLowerCase() && password === ADMIN_PASS) {
+        localStorage.setItem(SESSION_KEY, JSON.stringify({ role: "admin", email: ADMIN_EMAIL }));
+        showToast("Welcome Boss! Root Admin Panel unlocked.");
+        initApp();
+        return;
+      }
+
+      const users = getUsers();
+      const matchedUser = users.find(u => u.email === email && u.password === password);
+
+      if (!matchedUser) {
+        showToast("Account not found or wrong password. Please Sign Up first!", true);
+        return;
+      }
+
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ role: "customer", email: matchedUser.email, name: matchedUser.name }));
+      showToast(`Welcome, ${matchedUser.name}`);
+      initApp();
+    }
+
+    function logout() {
+      localStorage.removeItem(SESSION_KEY);
+      if (telemetryInterval) clearInterval(telemetryInterval);
+      initApp();
+      showToast("Logged out.");
+    }
+
+    function fillTargetEmail(email) {
+      document.getElementById("assign-user-email").value = email;
+      showToast(`Selected: ${email}`);
+    }
+
+    // ================= ADMIN FUNCTIONS =================
+    function renderAdminDashboard() {
+      const users = getUsers();
+      const servers = getServers();
+      const serverKeys = Object.keys(servers);
+
+      document.getElementById("stat-users").textContent = users.length;
+      document.getElementById("stat-vps").textContent = serverKeys.length;
+
+      const chipsContainer = document.getElementById("registered-email-chips");
+      if (users.length > 0) {
+        chipsContainer.innerHTML = users.map(u =>
+          `<button type="button" class="chip-btn" onclick="fillTargetEmail('${u.email}')">+ ${u.email}</button>`
+        ).join("");
+      } else {
+        chipsContainer.innerHTML = `<span style="font-size:11.5px;color:var(--text-muted);">Type any customer email above to assign a VPS.</span>`;
+      }
+
+      const usersTable = document.getElementById("admin-users-table");
+      if (users.length === 0) {
+        usersTable.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--text-muted);">No customers signed up yet.</td></tr>`;
+      } else {
+        usersTable.innerHTML = users.map(u => {
+          const hasVps = Boolean(servers[u.email]);
+          return `
+            <tr>
+              <td><strong>${u.name}</strong></td>
+              <td>${u.email}</td>
+              <td><span class="status-pill ${hasVps ? 'status-online' : 'status-offline'}">${hasVps ? 'VPS Active' : 'No VPS'}</span></td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      const vpsTable = document.getElementById("admin-vps-table");
+      if (serverKeys.length === 0) {
+        vpsTable.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No VPS deployed yet.</td></tr>`;
+      } else {
+        vpsTable.innerHTML = serverKeys.map(email => {
+          const s = servers[email];
+          return `
+            <tr>
+              <td><strong>${email}</strong></td>
+              <td>${s.name}<br><small style="color:var(--text-muted);">${s.region}</small></td>
+              <td><span class="status-pill status-online"><span class="dot"></span>${s.uptime}</span></td>
+              <td><button class="btn btn-danger" style="padding:6px 10px;font-size:12px;" onclick="deleteVPS('${email}')">Revoke</button></td>
+            </tr>
+          `;
+        }).join("");
+      }
+    }
+
+    function deployVPS(e) {
+      e.preventDefault();
+      const email = document.getElementById("assign-user-email").value.trim().toLowerCase();
+      if (!email || email === ADMIN_EMAIL.toLowerCase()) {
+        showToast("Enter a valid customer email!", true);
+        return;
+      }
+
+      const ipVal = document.getElementById("vps-ip").value.trim();
+      const baseHost = ipVal.split(":")[0] || "in-mum01.floravps.net";
+      const mainPort = ipVal.split(":")[1] || "25565";
+
+      const servers = getServers();
+      servers[email] = {
+        name: document.getElementById("vps-name").value.trim(),
+        plan: document.getElementById("vps-plan").value,
+        ip: ipVal,
+        region: document.getElementById("vps-region").value,
+        os: document.getElementById("vps-os").value,
+        uptime: document.getElementById("vps-uptime").value,
+        code: document.getElementById("vps-code").value.trim() || "java -Xms4G -Xmx8G -jar server.jar nogui\necho 'Flora VPS 24/7 Active'",
+        state: "online",
+        files: {
+          "start.sh": "#!/bin/bash\n" + (document.getElementById("vps-code").value.trim() || "java -Xms4G -Xmx8G -jar server.jar nogui"),
+          "server.properties": "server-port=" + mainPort + "\nmotd=Powered by Flora VPS 24/7\nmax-players=100\nonline-mode=false\nview-distance=10",
+          "flora-guard.yml": "anti-ddos: true\nauto-restart-24-7: true\nbedrock-geyser-bridge: enabled"
+        },
+        ports: [
+          { host: baseHost, port: mainPort, service: "Primary TCP/UDP (Game/SSH)" },
+          { host: baseHost, port: "19132", service: "Bedrock / GeyserMC UDP" }
+        ],
+        backups: [
+          { name: "Initial-Clean-Deploy.tar.gz", date: new Date().toLocaleString(), size: "1.4 GB" }
+        ]
+      };
+
+      saveServers(servers);
+      renderAdminDashboard();
+      showToast(`VPS deployed to ${email}!`);
+    }
+
+    function deleteVPS(email) {
+      const servers = getServers();
+      delete servers[email];
+      saveServers(servers);
+      renderAdminDashboard();
+      showToast(`VPS revoked from ${email}.`);
+    }
+
+    // ================= CUSTOMER PANEL FUNCTIONS =================
+    function switchPanelTab(tabName, btnEl) {
+      document.querySelectorAll(".panel-tab").forEach(b => b.classList.remove("active"));
+      btnEl.classList.add("active");
+      document.querySelectorAll(".subtab-view").forEach(v => v.classList.add("hidden"));
+      document.getElementById("subtab-" + tabName).classList.remove("hidden");
+    }
+
+    function renderCustomerDashboard() {
+      const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+      const servers = getServers();
+      const myVPS = servers[session.email];
+
+      document.getElementById("customer-email-label").textContent = session.email;
+
+      if (!myVPS) {
+        document.getElementById("customer-has-vps").classList.add("hidden");
+        return;
+      }
+
+      document.getElementById("customer-has-vps").classList.remove("hidden");
+
+      document.getElementById("cust-vps-name").textContent = myVPS.name;
+      document.getElementById("cust-vps-plan").textContent = myVPS.plan;
+      document.getElementById("cust-vps-ip").textContent = myVPS.ip;
+      document.getElementById("cust-vps-region").textContent = myVPS.region;
+      document.getElementById("cust-vps-os").textContent = myVPS.os;
+      document.getElementById("cust-startup-code").textContent = myVPS.code;
+
+      document.getElementById("sftp-host").value = "sftp://" + myVPS.ip.split(":")[0] + ":2022";
+      document.getElementById("sftp-user").value = session.email.split("@")[0] + ".flora";
+
+      updatePowerUI(myVPS.state);
+      bootConsoleLogs(myVPS);
+      renderFileManager(myVPS);
+      renderPortsTable(myVPS);
+      renderBackupsTable(myVPS);
+
+      if (telemetryInterval) clearInterval(telemetryInterval);
+      telemetryInterval = setInterval(() => {
+        const s = getServers()[session.email];
+        if (s && s.state === "online") {
+          const cpu = (Math.random() * 16 + 7).toFixed(1);
+          const ram = (Math.random() * 1.3 + 1.4).toFixed(1);
+          const dl = (Math.random() * 25 + 10).toFixed(1);
+          const ul = (Math.random() * 12 + 4).toFixed(1);
+          document.getElementById("metric-cpu").textContent = cpu + "%";
+          document.getElementById("bar-cpu").style.width = cpu + "%";
+          document.getElementById("metric-ram").textContent = ram + " GB";
+          document.getElementById("bar-ram").style.width = Math.min(88, ram * 14) + "%";
+          document.getElementById("metric-traffic").textContent = `↓ ${dl} MB/s   ↑ ${ul} MB/s`;
+        }
+      }, 2400);
+    }
+
+    function updatePowerUI(state) {
+      const pill = document.getElementById("cust-status-pill");
+      const text = document.getElementById("cust-status-text");
+      if (state === "online") {
+        pill.className = "status-pill status-online";
+        text.textContent = "24/7 ONLINE";
+        document.getElementById("metric-net").textContent = "24/7 Active";
+      } else {
+        pill.className = "status-pill status-offline";
+        text.textContent = "OFFLINE";
+        document.getElementById("metric-net").textContent = "Halted";
+        document.getElementById("metric-cpu").textContent = "0.0%";
+        document.getElementById("bar-cpu").style.width = "0%";
+        document.getElementById("metric-ram").textContent = "0.0 GB";
+        document.getElementById("bar-ram").style.width = "0%";
+      }
+    }
+
+    function appendLog(msg, type = "info") {
+      const box = document.getElementById("console-output");
+      const time = new Date().toLocaleTimeString();
+      const line = document.createElement("div");
+      line.className = "console-line";
+      line.innerHTML = `<span class="console-time">[${time}]</span> <span class="console-${type}">${msg}</span>`;
+      box.appendChild(line);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function bootConsoleLogs(vps) {
+      const box = document.getElementById("console-output");
+      box.innerHTML = "";
+      appendLog(`Flora VPS Hypervisor v3.0 — Connecting to ${vps.region}...`, "info");
+      if (vps.state === "online") {
+        appendLog(`Executing Admin Startup Script:`, "warn");
+        vps.code.split("\n").forEach(cmdLine => {
+          if (cmdLine.trim()) appendLog(`$ ${cmdLine}`, "ok");
+        });
+        appendLog(`Instance "${vps.name}" is ONLINE at ${vps.ip} (24/7 Anti-Sleep Active).`, "ok");
+      } else {
+        appendLog(`Server is offline. Press Start to boot container.`, "err");
+      }
+    }
+
+    function powerAction(action) {
+      const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+      const servers = getServers();
+      const myVPS = servers[session.email];
+      if (!myVPS) return;
+
+      if (action === "start") {
+        myVPS.state = "online";
+        saveServers(servers);
+        updatePowerUI("online");
+        appendLog("Starting 24/7 KVM container...", "ok");
+        myVPS.code.split("\n").forEach(c => { if (c.trim()) appendLog(`$ ${c}`, "info"); });
+        appendLog("Server is now ONLINE.", "ok");
+        showToast("VPS Started!");
+      } else if (action === "restart") {
+        myVPS.state = "online";
+        saveServers(servers);
+        updatePowerUI("online");
+        appendLog("Rebooting instance...", "warn");
+        setTimeout(() => appendLog("Reboot complete. All services 24/7 Online.", "ok"), 700);
+        showToast("VPS Restarted!");
+      } else if (action === "stop") {
+        myVPS.state = "offline";
+        saveServers(servers);
+        updatePowerUI("offline");
+        appendLog("Stopping processes... Container offline.", "err");
+        showToast("VPS Stopped.");
+      }
+    }
+
+    function runQuickCmd(cmd) {
+      document.getElementById("console-cmd").value = cmd;
+      sendConsoleCommand(new Event("submit"));
+    }
+
+    function sendConsoleCommand(e) {
+      e.preventDefault();
+      const input = document.getElementById("console-cmd");
+      const cmd = input.value.trim();
+      if (!cmd) return;
+      input.value = "";
+
+      appendLog(`root@floravps:~# ${cmd}`, "info");
+      const lower = cmd.toLowerCase();
+
+      if (lower === "help") {
+        appendLog("Commands: help, status, htop, neofetch, plugins, ping, clear", "ok");
+      } else if (lower === "status") {
+        appendLog("Status: 24/7 ONLINE | Anti-DDoS: Active | Uptime: 99.99% | Packet Loss: 0%", "ok");
+      } else if (lower === "htop") {
+        appendLog("PID 1042 root 12.1% CPU | java/node daemon running | Load Avg: 0.24, 0.19, 0.15", "ok");
+      } else if (lower === "neofetch") {
+        appendLog("OS: Flora Cloud Linux 24.04 LTS | Kernel: 6.8-kvm | Uplink: 10Gbps NVMe", "ok");
+      } else if (lower === "plugins") {
+        appendLog("Active Modules: GeyserMC, Floodgate, ViaVersion, FloraGuard-Pro", "ok");
+      } else if (lower === "ping") {
+        appendLog("64 bytes from 1.1.1.1: icmp_seq=1 ttl=58 time=2.41 ms", "ok");
+      } else if (lower === "clear") {
+        clearConsole();
+      } else {
+        appendLog(`Command executed: ${cmd} [Exit Code 0]`, "ok");
+      }
+    }
+
+    function clearConsole() { document.getElementById("console-output").innerHTML = ""; }
+
+    function renderFileManager(vps) {
+      const list = document.getElementById("file-list-container");
+      const files = vps.files || {};
+      list.innerHTML = Object.keys(files).map(fname => `
+        <div class="file-item">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;">📄 ${fname}</span>
+          <button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="openFileEditor('${fname}')">Edit</button>
+        </div>
+      `).join("");
+    }
+
+    function openFileEditor(fname) {
+      const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+      const myVPS = getServers()[session.email];
+      currentEditingFile = fname;
+      document.getElementById("editor-filename").textContent = "Editing: " + fname;
+      document.getElementById("file-editor-area").value = myVPS.files[fname] || "";
+    }
+
+    function saveEditedFile() {
+      if (!currentEditingFile) return;
+      const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+      const servers = getServers();
+      servers[session.email].files[currentEditingFile] = document.getElementById("file-editor-area").value;
+      saveServers(servers);
+      showToast(`Saved ${currentEditingFile}!`);
+    }
+
+    function createNewFile() {
+      const fname = prompt("Enter new file name (e.g. config.yml):");
+      if (!fname) return;
+      const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+      const servers = getServers();
+      servers[session.email].files[fname.trim()] = "# Created on Flora VPS\n";
+      saveServers(servers);
+      renderFileManager(servers[session.email]);
+      openFileEditor(fname.trim());
+      showToast(`Created ${fname.trim()}`);
+    }
+
+    function renderPortsTable(vps) {
+      const tbody = document.getElementById("ports-table-body");
+      tbody.innerHTML = (vps.ports || []).map(p => `
+        <tr>
+          <td><code>${p.host}</code></td>
+          <td><strong>${p.port}</strong></td>
+          <td>${p.service}</td>
+          <td><span class="status-pill status-online">L7 Protected</span></td>
+        </tr>
+      `).join("");
+    }
+
+    function allocateExtraPort() {
+      const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+      const servers = getServers();
+      const myVPS = servers[session.email];
+      const randomPort = Math.floor(25570 + Math.random() * 400);
+      myVPS.ports.push({
+        host: myVPS.ip.split(":")[0],
+        port: String(randomPort),
+        service: "Custom TCP/UDP Allocation"
+      });
+      saveServers(servers);
+      renderPortsTable(myVPS);
+      showToast(`Allocated port ${randomPort}!`);
+    }
+
+    function renderBackupsTable(vps) {
+      const tbody = document.getElementById("backups-table-body");
+      tbody.innerHTML = (vps.backups || []).map((b, idx) => `
+        <tr>
+          <td><strong>${b.name}</strong></td>
+          <td>${b.date}</td>
+          <td>${b.size}</td>
+          <td><button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="showToast('Restored ${b.name}!')">Restore</button></td>
+        </tr>
+      `).join("");
+    }
+
+    function createBackup() {
+      const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+      const servers = getServers();
+      const myVPS = servers[session.email];
+      const snapName = "Snapshot-" + Math.floor(1000 + Math.random() * 9000) + ".tar.gz";
+      myVPS.backups.unshift({ name: snapName, date: new Date().toLocaleString(), size: "1.6 GB" });
+      saveServers(servers);
+      renderBackupsTable(myVPS);
+      showToast(`Snapshot ${snapName} created!`);
+    }
+
+    function copyText(elementId, label) {
+      const txt = document.getElementById(elementId).textContent;
+      navigator.clipboard.writeText(txt);
+      showToast(`${label} copied!`);
+    }
+
+    function initApp() {
+      const sessionRaw = localStorage.getItem(SESSION_KEY);
+      const authView = document.getElementById("auth-view");
+      const adminView = document.getElementById("admin-view");
+      const custView = document.getElementById("customer-view");
+
+      authView.classList.add("hidden");
+      adminView.classList.add("hidden");
+      custView.classList.add("hidden");
+
+      if (!sessionRaw) {
+        authView.classList.remove("hidden");
+        return;
+      }
+
+      const session = JSON.parse(sessionRaw);
+      if (session.role === "admin") {
+        adminView.classList.remove("hidden");
+        document.getElementById("admin-email-label").textContent = session.email;
+        renderAdminDashboard();
+      } else {
+        custView.classList.remove("hidden");
+        renderCustomerDashboard();
+      }
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
