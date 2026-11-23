@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flora VPS — Premium 24/7 Cloud Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #673de6;
+            --primary-dark: #4f29c6;
+            --accent: #00b090;
+            --bg: #0b0f19;
+            --dark: #141927;
+            --text: #24174e;
+            --muted: #676b7e;
+            --border: #e2e5f2;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(103, 61, 230, 0.30), transparent 42%),
+                radial-gradient(circle at 85% 75%, rgba(0, 176, 144, 0.24), transparent 44%),
+                linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 34px 34px, 34px 34px;
+            background-attachment: fixed;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .hidden { display: none !important; }
+
+        header {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .brand { font-size: 1.45rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .brand i { color: var(--accent); }
+        .brand span { color: var(--primary); }
+        .pro-badge {
+            background: linear-gradient(135deg, #673de6, #00b090);
+            color: #fff; font-size: 0.7rem; padding: 3px 8px;
+            border-radius: 99px; font-weight: 700; letter-spacing: 0.4px;
+        }
+
+        button {
+            border: none; border-radius: 8px; padding: 10px 16px;
+            font-weight: 600; cursor: pointer; display: inline-flex;
+            align-items: center; gap: 7px; transition: 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { background: #fff; border: 1.5px solid var(--primary); color: var(--primary); }
+        .btn-green { background: var(--accent); color: #fff; }
+        .btn-red { background: #e53935; color: #fff; }
+        .btn-amber { background: #f59e0b; color: #fff; }
+        .btn-dark { background: var(--dark); color: #fff; }
+        .btn-slate { background: #334155; color: #fff; }
+        .btn-link {
+            background: transparent; color: var(--primary); padding: 4px 2px;
+            font-size: 0.88rem; text-decoration: underline;
+        }
+        .btn-sm { padding: 7px 12px; font-size: 0.84rem; }
+
+        .wrap { max-width: 1160px; margin: 30px auto; padding: 0 20px; }
+        .panel-head-card {
+            background: rgba(255, 255, 255, 0.97);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: rgba(20, 25, 39, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: #f8fafc;
+        }
+        .stat-box small { color: #94a3b8; font-size: 0.78rem; display: block; margin-bottom: 4px; }
+        .stat-box strong { font-size: 1.35rem; color: #fff; }
+
+        .board-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .section-title-light {
+            color: #f8fafc;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+        }
+        .search-input {
+            background: rgba(20, 25, 39, 0.95);
+            color: #fff;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 9px 13px;
+            font-size: 0.88rem;
+            min-width: 240px;
+        }
+
+        .auth-box {
+            max-width: 430px; margin: 50px auto; background: rgba(255, 255, 255, 0.98);
+            padding: 30px; border-radius: 14px; border: 1px solid var(--border);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+        }
+        .auth-box h2 { margin-bottom: 8px; }
+        .auth-box p { color: var(--muted); font-size: 0.9rem; margin-bottom: 16px; }
+
+        .err-msg {
+            background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;
+            padding: 10px 12px; border-radius: 8px; font-size: 0.88rem;
+            font-weight: 600; margin-bottom: 14px;
+        }
+        .ok-msg {
+            background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7;
+            padding: 10px 12px; border-radius: 8px; font-size: 0.88rem;
+            font-weight: 600; margin-bottom: 14px;
+        }
+
+        .field { margin-bottom: 14px; }
+        .field label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 5px; }
+        .field input, .field select {
+            width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+            border-radius: 8px; font-size: 0.95rem; background: #fff;
+        }
+
+        .auth-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .section-divider {
+            margin: 18px 0 14px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+        .card {
+            background: rgba(255, 255, 255, 0.98); border: 1px solid var(--border);
+            border-radius: 14px; padding: 22px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+        }
+        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+        .pill { padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+        .pill-on { background: #d1fae5; color: #065f46; }
+        .pill-off { background: #fee2e2; color: #991b1b; }
+        .pill-boot { background: #fef3c7; color: #92400e; }
+
+        .specs-strip {
+            display: flex; flex-wrap: wrap; gap: 7px;
+            margin: 8px 0 12px; font-size: 0.82rem;
+        }
+        .spec-tag {
+            background: #eef0ff; color: var(--text);
+            padding: 4px 9px; border-radius: 6px; font-weight: 600;
+        }
+
+        .meters {
+            background: #f8f9ff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+        .meter-item { margin-bottom: 8px; }
+        .meter-item:last-child { margin-bottom: 0; }
+        .meter-label {
+            display: flex; justify-content: space-between;
+            font-size: 0.78rem; font-weight: 700; color: var(--text); margin-bottom: 4px;
+        }
+        .meter-track {
+            height: 7px; background: #e2e8f0; border-radius: 99px; overflow: hidden;
+        }
+        .meter-fill {
+            height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 99px;
+        }
+
+        .ssh-box {
+            background: var(--dark); color: #e2e8f0; padding: 14px;
+            border-radius: 10px; font-family: monospace; font-size: 0.84rem;
+            margin: 12px 0; line-height: 1.72; border: 1px solid #242b42;
+        }
+        .ssh-line {
+            display: flex; justify-content: space-between; align-items: center; gap: 8px;
+        }
+        .copy-btn {
+            background: #2b3044; color: #e2e8f0; padding: 3px 8px;
+            border-radius: 5px; font-size: 0.74rem; font-family: sans-serif;
+        }
+        .copy-btn:hover { background: #3b425e; }
+
+        .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        /* Large Dedicated Console Box */
+        .console-box {
+            margin-top: 16px;
+            background: #090c14;
+            border: 1.5px solid #2b3452;
+            border-radius: 12px;
+            padding: 16px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.45);
+        }
+        .console-head {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+            color: #a5b4fc; font-size: 0.8rem; font-weight: 700; margin-bottom: 10px;
+            padding-bottom: 8px; border-bottom: 1px solid #1e263d;
+        }
+        .console-tools { display: flex; gap: 12px; align-items: center; }
+        .tool-link { cursor: pointer; color: #93c5fd; font-weight: 600; font-size: 0.78rem; }
+        .tool-link:hover { text-decoration: underline; }
+
+        .quick-cmds {
+            display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;
+        }
+        .q-btn {
+            background: #171e32; color: #cbd5e1; border: 1px solid #2b344f;
+            padding: 5px 9px; border-radius: 6px; font-size: 0.75rem; font-family: monospace;
+        }
+        .q-btn:hover { background: #26304b; }
+
+        .console-log {
+            min-height: 170px;
+            max-height: 240px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #06080e;
+            border: 1px solid #1a2136;
+            border-radius: 8px;
+            line-height: 1.55;
+            color: #e2e8f0;
+            transition: max-height 0.25s ease, min-height 0.25s ease;
+        }
+        .console-log.expanded {
+            min-height: 360px;
+            max-height: 460px;
+        }
+
+        .console-cmd-area {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .console-cmd-label {
+            color: #94a3b8;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+        .console-row {
+            display: flex;
+            gap: 8px;
+        }
+        .console-row input.big-cmd-input {
+            flex: 1;
+            background: #131929;
+            color: #f8fafc;
+            border: 1.5px solid #334166;
+            border-radius: 9px;
+            padding: 12px 14px;
+            font-family: monospace;
+            font-size: 0.92rem;
+        }
+        .console-row input.big-cmd-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .toast {
+            position: fixed; bottom: 20px; right: 20px; background: var(--dark);
+            color: #fff; padding: 12px 18px; border-radius: 10px;
+            border-left: 4px solid var(--accent); font-weight: 600; z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <i class="fas fa-server"></i> Flora<span>VPS</span>
+        <span class="pro-badge">24/7 PRO</span>
+    </div>
+    <button id="logout-btn" class="btn-red hidden" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+</header>
+
+<!-- AUTH SCREEN (LOG IN / SIGN IN + FORGOT PASSWORD) -->
+<div id="auth-screen" class="auth-box">
+    <div id="auth-error" class="err-msg hidden"></div>
+    <div id="auth-success" class="ok-msg hidden"></div>
+
+    <!-- LOG IN / SIGN IN FORM -->
+    <div id="login-form">
+        <h2>Log In / Sign In</h2>
+        <p>Enter your Email / Username and Password to access Flora VPS.</p>
+        <div class="field">
+            <label>Email / Username</label>
+            <input type="text" id="login-id" placeholder="your email or username">
+        </div>
+        <div class="field">
+            <label>Password</label>
+            <input type="password" id="login-pass" placeholder="Enter password">
+        </div>
+        <button class="btn-primary" style="width:100%;justify-content:center;" onclick="handleSignIn()">
+            <i class="fas fa-sign-in-alt"></i> Log In / Sign In
+        </button>
+        <div class="auth-footer-row">
+            <button type="button" class="btn-link" onclick="toggleForgotBox(true)">
+                <i class="fas fa-key"></i> Forgot Password
+            </button>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD FORM -->
+    <div id="forgot-form" class="hidden">
+        <h2>Forgot Password</h2>
+        <p>Enter your account Email / Username and set a new password (min 6 chars).</p>
+        <div class="field">
+            <label>Email / Username</label>
+            <input type="text" id="fp-id" placeholder="your email or username">
+        </div>
+        <div class="field">
+            <label>New Password (min 6 characters)</label>
+            <input type="password" id="fp-new-pass" placeholder="Enter new password">
+        </div>
+        <button class="btn-green" style="width:100%;justify-content:center;" onclick="handleForgotPassword()">
+            <i class="fas fa-check"></i> Reset Password
+        </button>
+        <div class="auth-footer-row">
+            <button type="button" class="btn-link" onclick="toggleForgotBox(false)">
+                <i class="fas fa-arrow-left"></i> Back to Log In
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- CUSTOMER PANEL -->
+<div id="customer-panel" class="wrap hidden">
+    <div class="panel-head-card">
+        <div>
+            <h2>My 24/7 VPS</h2>
+            <p style="color:var(--muted);">Account: <strong id="cust-info-id"></strong></p>
+        </div>
+        <button class="btn-outline" onclick="loadCustomerVPS()"><i class="fas fa-sync"></i> Refresh</button>
+    </div>
+    <div id="customer-vps-grid" class="grid"></div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel" class="wrap hidden">
+    <div class="panel-head-card">
+        <h2>Flora VPS Admin — 24/7 Control</h2>
+        <button class="btn-green" onclick="openCreateBox()"><i class="fas fa-plus"></i> Create</button>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-box"><small>TOTAL VPS</small><strong id="stat-total">0</strong></div>
+        <div class="stat-box"><small>24/7 RUNNING</small><strong id="stat-running">0</strong></div>
+        <div class="stat-box"><small>STOPPED</small><strong id="stat-stopped">0</strong></div>
+    </div>
+
+    <div class="card" id="create-box" style="margin-bottom:26px;">
+        <h3 style="margin-bottom:6px;">Create 24/7 VPS</h3>
+        <p style="color:var(--muted);font-size:0.88rem;margin-bottom:14px;">Write Core, RAM, Storage, Hostname, Region, and send to Customer Email / Username.</p>
+
+        <div class="grid">
+            <div class="field">
+                <label>CPU Cores (Core)</label>
+                <input type="text" id="vps-core" placeholder="e.g. 2 Core">
+            </div>
+            <div class="field">
+                <label>RAM</label>
+                <input type="text" id="vps-ram" placeholder="e.g. 8 GB">
+            </div>
+            <div class="field">
+                <label>Storage</label>
+                <input type="text" id="vps-disk" placeholder="e.g. 100 GB NVMe">
+            </div>
+            <div class="field">
+                <label>Hostname</label>
+                <input type="text" id="vps-host" placeholder="e.g. my-vps">
+            </div>
+            <div class="field">
+                <label>Region / Node</label>
+                <select id="vps-region">
+                    <option value="" selected disabled>Select Region / Node</option>
+                    <option value="IN-Mumbai Node #1">IN-Mumbai Node #1</option>
+                    <option value="SG-Singapore Node #2">SG-Singapore Node #2</option>
+                    <option value="DE-Frankfurt Node #3">DE-Frankfurt Node #3</option>
+                    <option value="US-Virginia Node #4">US-Virginia Node #4</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>OS / Setup</label>
+                <select id="vps-os">
+                    <option value="" selected disabled>Select OS / Setup</option>
+                    <option value="Ubuntu 24.04 LTS">Ubuntu 24.04 LTS</option>
+                    <option value="Debian 12">Debian 12</option>
+                    <option value="Minecraft / Bot 24/7">Minecraft / Bot 24/7</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section-divider">Customer Email / Username</div>
+
+        <div class="field">
+            <label>Customer Email / Username</label>
+            <input type="text" id="target-id" placeholder="customer email or username">
+        </div>
+
+        <button class="btn-primary" onclick="createAndSendVPS()"><i class="fas fa-plus"></i> Create</button>
+    </div>
+
+    <div class="board-bar">
+        <h3 class="section-title-light">Created VPS Board</h3>
+        <input type="text" id="admin-search" class="search-input" placeholder="Search customer email or hostname..." oninput="loadAdminVPS()">
+    </div>
+    <div id="admin-vps-grid" class="grid"></div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+        getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const ADMIN_ID = 'admin@floravps.com';
+    let ADMIN_PASS = 'floraadmin123';
+
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    const isFirebaseReady = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("YOUR_");
+    let db = null;
+    if (isFirebaseReady) {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+    }
+
+    const LOCAL_KEY = 'flora_vps_own_site_v1';
+    let activeSession = { role: null, id: '', username: '' };
+
+    function getLocal() {
+        const raw = localStorage.getItem(LOCAL_KEY);
+        if (!raw) {
+            const init = { users: [], vpsList: [] };
+            localStorage.setItem(LOCAL_KEY, JSON.stringify(init));
+            return init;
+        }
+        return JSON.parse(raw);
+    }
+
+    function saveLocal(data) {
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(data));
+    }
+
+    function toast(msg) {
+        const el = document.getElementById('toast');
+        el.innerText = msg;
+        el.classList.remove('hidden');
+        setTimeout(() => el.classList.add('hidden'), 3200);
+    }
+
+    window.copyText = function(val, label) {
+        navigator.clipboard?.writeText(val).catch(() => {});
+        toast(`${label} copied`);
+    };
+
+    window.toggleExpandConsole = function(id, btn) {
+        const logEl = document.getElementById('log-' + id);
+        if (!logEl) return;
+        const isExp = logEl.classList.toggle('expanded');
+        if (btn) {
+            btn.innerHTML = isExp
+                ? '<i class="fas fa-compress-alt"></i> Normal'
+                : '<i class="fas fa-expand-alt"></i> Expand';
+        }
+    };
+
+    window.quickRun = function(id, cmdStr, isAdmin) {
+        const input = document.getElementById('cmd-' + id);
+        if (!input) return;
+        input.value = cmdStr;
+        window.runCmd(id, isAdmin);
+    };
+
+    function showAuthError(msg) {
+        clearAuthNotices();
+        const err = document.getElementById('auth-error');
+        err.innerText = msg;
+        err.classList.remove('hidden');
+    }
+
+    function showAuthSuccess(msg) {
+        clearAuthNotices();
+        const ok = document.getElementById('auth-success');
+        ok.innerText = msg;
+        ok.classList.remove('hidden');
+    }
+
+    function clearAuthNotices() {
+        const err = document.getElementById('auth-error');
+        const ok = document.getElementById('auth-success');
+        err.innerText = '';
+        ok.innerText = '';
+        err.classList.add('hidden');
+        ok.classList.add('hidden');
+    }
+
+    window.toggleForgotBox = function(showForgot) {
+        clearAuthNotices();
+        document.getElementById('login-form').classList.toggle('hidden', showForgot);
+        document.getElementById('forgot-form').classList.toggle('hidden', !showForgot);
+    };
+
+    window.handleForgotPassword = async function() {
+        clearAuthNotices();
+        const id = document.getElementById('fp-id').value.trim().toLowerCase();
+        const newPass = document.getElementById('fp-new-pass').value;
+
+        if (!id) {
+            return showAuthError('Error: Please enter your Email / Username.');
+        }
+        if (!newPass || newPass.length < 6) {
+            return showAuthError('Error: New password must be at least 6 characters.');
+        }
+
+        if (id === ADMIN_ID) {
+            ADMIN_PASS = newPass;
+            document.getElementById('fp-id').value = '';
+            document.getElementById('fp-new-pass').value = '';
+            toggleForgotBox(false);
+            document.getElementById('login-id').value = id;
+            return showAuthSuccess('Admin password updated. Log in with your new password.');
+        }
+
+        if (isFirebaseReady) {
+            const snap = await getDocs(collection(db, "users"));
+            const found = snap.docs.find(d => {
+                const u = d.data();
+                return u.email === id || (u.username && u.username === id);
+            });
+            if (!found) {
+                return showAuthError('Error: Account not found. Ask Admin to assign/create your account.');
+            }
+            await updateDoc(doc(db, "users", found.id), { password: newPass });
+        } else {
+            const store = getLocal();
+            const user = store.users.find(u => u.email === id || (u.username && u.username === id));
+            if (!user) {
+                return showAuthError('Error: Account not found.');
+            }
+            user.password = newPass;
+            saveLocal(store);
+        }
+
+        document.getElementById('fp-id').value = '';
+        document.getElementById('fp-new-pass').value = '';
+        toggleForgotBox(false);
+        document.getElementById('login-id').value = id;
+        showAuthSuccess('Password updated! You can now Log In.');
+    };
+
+    window.handleSignIn = async function() {
+        clearAuthNotices();
+        const id = document.getElementById('login-id').value.trim().toLowerCase();
+        const pass = document.getElementById('login-pass').value;
+
+        if (!id) {
+            return showAuthError('Error: Please enter Email / Username.');
+        }
+        if (!pass) {
+            return showAuthError('Error: Please enter Password.');
+        }
+
+        if (id === ADMIN_ID && pass === ADMIN_PASS) {
+            activeSession = { role: 'admin', id, username: 'admin' };
+            setView('admin-panel');
+            document.getElementById('create-box').classList.remove('hidden');
+            await loadAdminVPS();
+            toast('Admin Panel opened');
+            return;
+        }
+
+        let user = null;
+        if (isFirebaseReady) {
+            const snap = await getDocs(collection(db, "users"));
+            const found = snap.docs.find(d => {
+                const u = d.data();
+                return u.email === id || (u.username && u.username === id);
+            });
+            if (found) user = found.data();
+        } else {
+            const store = getLocal();
+            user = store.users.find(u => u.email === id || (u.username && u.username === id));
+        }
+
+        if (!user) {
+            return showAuthError('Error: Account does not exist.');
+        }
+        if (user.password !== pass) {
+            return showAuthError('Error: Wrong password. Use "Forgot Password" if needed.');
+        }
+
+        activeSession = { role: 'customer', id: user.email, username: user.username || '' };
+        document.getElementById('cust-info-id').innerText = user.username ? `${user.email} (${user.username})` : user.email;
+        setView('customer-panel');
+        await loadCustomerVPS();
+        toast('Logged in');
+    };
+
+    function setView(id) {
+        ['auth-screen', 'customer-panel', 'admin-panel'].forEach(v => {
+            document.getElementById(v).classList.add('hidden');
+        });
+        document.getElementById(id).classList.remove('hidden');
+        document.getElementById('logout-btn').classList.toggle('hidden', id === 'auth-screen');
+    }
+
+    window.logout = function() {
+        activeSession = { role: null, id: '', username: '' };
+        document.getElementById('login-pass').value = '';
+        clearAuthNotices();
+        toggleForgotBox(false);
+        setView('auth-screen');
+        toast('Logged out');
+    };
+
+    window.openCreateBox = function() {
+        const box = document.getElementById('create-box');
+        box.classList.remove('hidden');
+        box.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('vps-core').focus();
+    };
+
+    async function ensureCustomerUserRecord(targetId) {
+        const cleanId = targetId.trim().toLowerCase();
+        if (!cleanId || cleanId === ADMIN_ID) return;
+        const isEmail = cleanId.includes('@');
+        const defaultPass = `Flora@${Math.floor(100000 + Math.random()*900000)}`;
+
+        if (isFirebaseReady) {
+            const snap = await getDocs(collection(db, "users"));
+            const exists = snap.docs.some(d => {
+                const u = d.data();
+                return u.email === cleanId || (u.username && u.username === cleanId);
+            });
+            if (!exists) {
+                await addDoc(collection(db, "users"), {
+                    email: isEmail ? cleanId : `${cleanId}@floravps.local`,
+                    username: isEmail ? cleanId.split('@')[0] : cleanId,
+                    password: defaultPass
+                });
+            }
+        } else {
+            const store = getLocal();
+            const exists = store.users.some(u => u.email === cleanId || (u.username && u.username === cleanId));
+            if (!exists) {
+                store.users.push({
+                    email: isEmail ? cleanId : `${cleanId}@floravps.local`,
+                    username: isEmail ? cleanId.split('@')[0] : cleanId,
+                    password: defaultPass
+                });
+                saveLocal(store);
+            }
+        }
+    }
+
+    window.createAndSendVPS = async function() {
+        if (activeSession.role !== 'admin') return toast('Unauthorized');
+
+        const core = document.getElementById('vps-core').value.trim();
+        const ram = document.getElementById('vps-ram').value.trim();
+        const disk = document.getElementById('vps-disk').value.trim();
+        const hostname = (document.getElementById('vps-host').value.trim() || 'flora-vps').replace(/[^a-zA-Z0-9-]/g, '');
+        const region = document.getElementById('vps-region').value || 'IN-Mumbai Node #1';
+        const os = document.getElementById('vps-os').value || 'Ubuntu 24.04 LTS';
+        const targetId = document.getElementById('target-id').value.trim().toLowerCase();
+
+        if (!core || !ram || !disk) {
+            return toast('Please write Core, RAM, and Storage');
+        }
+        if (!targetId) {
+            return toast('Please enter Customer Email / Username');
+        }
+
+        await ensureCustomerUserRecord(targetId);
+
+        const randIP = `185.${Math.floor(Math.random()*200)+20}.${Math.floor(Math.random()*250)}.${Math.floor(Math.random()*250)}`;
+        const rootPass = `Flora@${Math.floor(100000 + Math.random()*900000)}`;
+
+        const vpsData = {
+            ownerId: targetId,
+            hostname,
+            core,
+            ram,
+            disk,
+            region,
+            os,
+            ip: randIP,
+            port: 22,
+            rootPass,
+            status: 'running',
+            uptime: '24/7 Active',
+            consoleHistory: [
+                `[BOOT] Provisioned ${hostname} on ${region}`,
+                `[SPEC] ${core} | ${ram} | ${disk} | ${os}`,
+                `[NET] IPv4 ${randIP} (Port 22) ready. Type "help" for commands.`
+            ],
+            createdAt: Date.now()
+        };
+
+        if (isFirebaseReady) {
+            await addDoc(collection(db, "vpsList"), vpsData);
+        } else {
+            const store = getLocal();
+            store.vpsList.push({ id: 'vps_' + Date.now().toString(36), ...vpsData });
+            saveLocal(store);
+        }
+
+        await loadAdminVPS();
+        document.getElementById('admin-vps-grid').scrollIntoView({ behavior: 'smooth' });
+        toast(`VPS created & sent to ${targetId}`);
+    };
+
+    async function fetchAllVPS() {
+        if (isFirebaseReady) {
+            const snap = await getDocs(collection(db, "vpsList"));
+            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+        return getLocal().vpsList;
+    }
+
+    window.loadCustomerVPS = async function() {
+        const all = await fetchAllVPS();
+        const list = all.filter(v =>
+            v.ownerId === activeSession.id || (activeSession.username && v.ownerId === activeSession.username)
+        );
+
+        const grid = document.getElementById('customer-vps-grid');
+        grid.innerHTML = '';
+
+        if (list.length === 0) {
+            grid.innerHTML = '<div class="card"><p>No 24/7 VPS assigned to your account yet.</p></div>';
+            return;
+        }
+
+        list.forEach(vps => {
+            grid.innerHTML += renderCard(vps, false);
+        });
+    };
+
+    window.loadAdminVPS = async function() {
+        if (activeSession.role !== 'admin') return;
+        const all = await fetchAllVPS();
+
+        document.getElementById('stat-total').innerText = all.length;
+        document.getElementById('stat-running').innerText = all.filter(v => v.status === 'running').length;
+        document.getElementById('stat-stopped').innerText = all.filter(v => v.status === 'stopped').length;
+
+        const q = (document.getElementById('admin-search')?.value || '').trim().toLowerCase();
+        const list = q
+            ? all.filter(v => v.ownerId.toLowerCase().includes(q) || v.hostname.toLowerCase().includes(q))
+            : all;
+
+        const grid = document.getElementById('admin-vps-grid');
+        grid.innerHTML = '';
+
+        if (list.length === 0) {
+            grid.innerHTML = '<div class="card"><p>No matching VPS found.</p></div>';
+            return;
+        }
+
+        list.forEach(vps => {
+            grid.innerHTML += renderCard(vps, true);
+        });
+    };
+
+    function renderCard(vps, isAdmin) {
+        let pillClass = 'pill-on';
+        let pillText = '● 24/7 RUNNING';
+        let cpuPct = 18, ramPct = 34, diskPct = 22;
+
+        if (vps.status === 'stopped') {
+            pillClass = 'pill-off';
+            pillText = '■ STOPPED';
+            cpuPct = 0; ramPct = 0; diskPct = 22;
+        } else if (vps.status === 'rebooting') {
+            pillClass = 'pill-boot';
+            pillText = '↻ REBOOTING';
+            cpuPct = 62; ramPct = 45; diskPct = 22;
+        }
+
+        const logs = Array.isArray(vps.consoleHistory) ? vps.consoleHistory.join('\n') : '';
+        const sshCmd = `ssh root@${vps.ip} -p ${vps.port}`;
+
+        return `
+            <div class="card" id="${vps.id}">
+                <div class="card-top">
+                    <h3>${vps.hostname}</h3>
+                    <span class="pill ${pillClass}">${pillText}</span>
+                </div>
+                ${isAdmin ? `<p style="font-size:0.85rem;color:var(--muted);margin-bottom:6px;">Assigned to: <strong>${vps.ownerId}</strong></p>` : ''}
+
+                <div class="specs-strip">
+                    <span class="spec-tag">${vps.core}</span>
+                    <span class="spec-tag">${vps.ram}</span>
+                    <span class="spec-tag">${vps.disk}</span>
+                    <span class="spec-tag">${vps.region || 'IN-Mumbai Node #1'}</span>
+                    <span class="spec-tag">${vps.os}</span>
+                </div>
+
+                <div class="meters">
+                    <div class="meter-item">
+                        <div class="meter-label"><span>CPU (${vps.core})</span><span>${cpuPct}%</span></div>
+                        <div class="meter-track"><div class="meter-fill" style="width:${cpuPct}%"></div></div>
+                    </div>
+                    <div class="meter-item">
+                        <div class="meter-label"><span>RAM (${vps.ram})</span><span>${ramPct}%</span></div>
+                        <div class="meter-track"><div class="meter-fill" style="width:${ramPct}%"></div></div>
+                    </div>
+                    <div class="meter-item">
+                        <div class="meter-label"><span>Storage (${vps.disk})</span><span>${diskPct}%</span></div>
+                        <div class="meter-track"><div class="meter-fill" style="width:${diskPct}%"></div></div>
+                    </div>
+                </div>
+
+                <div class="ssh-box">
+                    <div class="ssh-line">
+                        <span>IP: ${vps.ip} (Port ${vps.port})</span>
+                        <button class="copy-btn" onclick="copyText('${vps.ip}', 'IP')">Copy IP</button>
+                    </div>
+                    <div>User: root</div>
+                    <div class="ssh-line">
+                        <span>Password: ${vps.rootPass}</span>
+                        <button class="copy-btn" onclick="copyText('${vps.rootPass}', 'Password')">Copy Pass</button>
+                    </div>
+                    <div class="ssh-line">
+                        <span>SSH: ${sshCmd}</span>
+                        <button class="copy-btn" onclick="copyText('${sshCmd}', 'SSH Command')">Copy SSH</button>
+                    </div>
+                    <div>Status: ${vps.uptime}</div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-green" onclick="power('${vps.id}', 'running', ${isAdmin})"><i class="fas fa-play"></i> Start</button>
+                    <button class="btn-amber" onclick="rebootVPS('${vps.id}', ${isAdmin})"><i class="fas fa-redo"></i> Reboot</button>
+                    <button class="btn-red" onclick="power('${vps.id}', 'stopped', ${isAdmin})"><i class="fas fa-stop"></i> Stop</button>
+                    <button class="btn-slate" onclick="resetRootPass('${vps.id}', ${isAdmin})"><i class="fas fa-key"></i> Reset Pass</button>
+                    <button class="btn-outline" onclick="reinstallVPS('${vps.id}', ${isAdmin})"><i class="fas fa-download"></i> Reinstall</button>
+                    ${isAdmin ? `<button class="btn-dark" onclick="deleteVPS('${vps.id}')"><i class="fas fa-trash"></i> Delete</button>` : ''}
+                </div>
+
+                <div class="console-box">
+                    <div class="console-head">
+                        <span><i class="fas fa-terminal"></i> CONSOLE — root@${vps.hostname}:~#</span>
+                        <div class="console-tools">
+                            <span class="tool-link" onclick="toggleExpandConsole('${vps.id}', this)"><i class="fas fa-expand-alt"></i> Expand</span>
+                            <span class="tool-link" onclick="clearConsole('${vps.id}', ${isAdmin})">Clear</span>
+                        </div>
+                    </div>
+
+                    <div class="quick-cmds">
+                        <button class="q-btn" onclick="quickRun('${vps.id}', 'help', ${isAdmin})">help</button>
+                        <button class="q-btn" onclick="quickRun('${vps.id}', 'web-init', ${isAdmin})">web-init</button>
+                        <button class="q-btn" onclick="quickRun('${vps.id}', 'deploy', ${isAdmin})">deploy</button>
+                        <button class="q-btn" onclick="quickRun('${vps.id}', 'nginx', ${isAdmin})">nginx</button>
+                        <button class="q-btn" onclick="quickRun('${vps.id}', 'ssl', ${isAdmin})">ssl</button>
+                        <button class="q-btn" onclick="quickRun('${vps.id}', 'stats', ${isAdmin})">stats</button>
+                    </div>
+
+                    <div class="console-log" id="log-${vps.id}">${logs}</div>
+
+                    <div class="console-cmd-area">
+                        <span class="console-cmd-label">COMMAND INPUT</span>
+                        <div class="console-row">
+                            <input type="text" class="big-cmd-input" id="cmd-${vps.id}" placeholder="Write command here (e.g. help, web-init, deploy, nginx, ssl, stats)..." onkeydown="if(event.key==='Enter') runCmd('${vps.id}', ${isAdmin})">
+                            <button class="btn-primary" onclick="runCmd('${vps.id}', ${isAdmin})"><i class="fas fa-play"></i> Run</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    async function updateVPSRecord(id, patch) {
+        if (isFirebaseReady) {
+            await updateDoc(doc(db, "vpsList", id), patch);
+        } else {
+            const store = getLocal();
+            const vps = store.vpsList.find(v => v.id === id);
+            if (!vps) return null;
+            Object.assign(vps, patch);
+            saveLocal(store);
+            return vps;
+        }
+    }
+
+    async function getSingleVPS(id) {
+        const all = await fetchAllVPS();
+        return all.find(v => v.id === id) || null;
+    }
+
+    async function appendConsoleLine(id, line) {
+        const vps = await getSingleVPS(id);
+        if (!vps) return;
+        const hist = Array.isArray(vps.consoleHistory) ? [...vps.consoleHistory] : [];
+        hist.push(line);
+        await updateVPSRecord(id, { consoleHistory: hist.slice(-70) });
+    }
+
+    window.resetRootPass = async function(id, isAdmin) {
+        const newPass = `Flora@${Math.floor(100000 + Math.random()*900000)}`;
+        await updateVPSRecord(id, { rootPass: newPass });
+        await appendConsoleLine(id, `[AUTH] Root password updated -> ${newPass}`);
+        toast('New root password generated');
+        if (isAdmin) await loadAdminVPS();
+        else await loadCustomerVPS();
+    };
+
+    window.reinstallVPS = async function(id, isAdmin) {
+        const vps = await getSingleVPS(id);
+        if (!vps) return;
+        await appendConsoleLine(id, `[REINSTALL] Wiping & installing fresh ${vps.os}...`);
+        await updateVPSRecord(id, { status: 'rebooting', uptime: 'Installing OS...' });
+        if (isAdmin) await loadAdminVPS();
+        else await loadCustomerVPS();
+        toast(`Reinstalling ${vps.os}...`);
+
+        setTimeout(async () => {
+            await appendConsoleLine(id, `[DONE] Fresh ${vps.os} installed & running 24/7.`);
+            await updateVPSRecord(id, { status: 'running', uptime: '24/7 Active' });
+            if (isAdmin) await loadAdminVPS();
+            else await loadCustomerVPS();
+            toast('OS reinstall complete');
+        }, 1400);
+    };
+
+    window.clearConsole = async function(id, isAdmin) {
+        await updateVPSRecord(id, { consoleHistory: [`[CONSOLE] Cleared.`] });
+        if (isAdmin) await loadAdminVPS();
+        else await loadCustomerVPS();
+    };
+
+    window.runCmd = async function(id, isAdmin) {
+        const input = document.getElementById('cmd-' + id);
+        if (!input) return;
+        const rawCmd = input.value.trim();
+        if (!rawCmd) return;
+        input.value = '';
+
+        const vps = await getSingleVPS(id);
+        if (!vps) return;
+
+        const low = rawCmd.toLowerCase();
+        await appendConsoleLine(id, `root@${vps.hostname}:~# ${rawCmd}`);
+
+        if (vps.status !== 'running' && low !== 'start' && low !== 'help') {
+            await appendConsoleLine(id, `[ERROR] Instance is ${vps.status.toUpperCase()}. Click "Start" or run "start" first.`);
+        } else if (low === 'help') {
+            await appendConsoleLine(id, `Commands: help, web-init, deploy, nginx, ssl, ls, pwd, stats, ports, start, stop, clear`);
+        } else if (low === 'web-init') {
+            await appendConsoleLine(id, `[WEB] Created /var/www/${vps.hostname}/public_html & index.html`);
+        } else if (low === 'deploy') {
+            await appendConsoleLine(id, `[DEPLOY] Site bundle live at http://${vps.ip}/ (${vps.hostname})`);
+        } else if (low === 'nginx') {
+            await appendConsoleLine(id, `[NGINX] active (running) — serving /var/www/${vps.hostname}/public_html`);
+        } else if (low === 'ssl') {
+            await appendConsoleLine(id, `[SSL] Certificate ready for ${vps.hostname} (${vps.ip})`);
+        } else if (low === 'ls') {
+            await appendConsoleLine(id, `drwxr-xr-x  public_html/   index.html   nginx.conf   logs/`);
+        } else if (low === 'pwd') {
+            await appendConsoleLine(id, `/var/www/${vps.hostname}`);
+        } else if (low === 'uname' || low === 'uname -a') {
+            await appendConsoleLine(id, `Linux ${vps.hostname} 6.8.0-floravps #24/7-SMP x86_64 GNU/Linux`);
+        } else if (low === 'stats' || low === 'top') {
+            await appendConsoleLine(id, `Node: ${vps.region || 'IN-Mumbai'} | ${vps.core} | ${vps.ram} | ${vps.disk}`);
+        } else if (low === 'ports') {
+            await appendConsoleLine(id, `Open Ports: 22/tcp (SSH), 80/tcp (HTTP), 443/tcp (HTTPS), 25565/tcp`);
+        } else if (low === 'start') {
+            await updateVPSRecord(id, { status: 'running', uptime: '24/7 Active' });
+            await appendConsoleLine(id, `[OK] Instance started (24/7 Active).`);
+        } else if (low === 'stop') {
+            await updateVPSRecord(id, { status: 'stopped', uptime: 'Offline' });
+            await appendConsoleLine(id, `[OK] Instance stopped.`);
+        } else if (low === 'clear') {
+            await updateVPSRecord(id, { consoleHistory: [] });
+        } else {
+            await appendConsoleLine(id, `[EXEC] "${rawCmd}" completed on ${vps.hostname} (${vps.ip})`);
+        }
+
+        if (isAdmin) await loadAdminVPS();
+        else await loadCustomerVPS();
+    };
+
+    window.power = async function(id, state, isAdmin) {
+        const uptime = state === 'running' ? '24/7 Active' : 'Offline';
+        await appendConsoleLine(id, `[POWER] State -> ${state.toUpperCase()}`);
+        await updateVPSRecord(id, { status: state, uptime });
+        toast(`Status: ${state.toUpperCase()}`);
+        if (isAdmin) await loadAdminVPS();
+        else await loadCustomerVPS();
+    };
+
+    window.rebootVPS = async function(id, isAdmin) {
+        await appendConsoleLine(id, `[REBOOT] Restarting instance...`);
+        await updateVPSRecord(id, { status: 'rebooting' });
+        if (isAdmin) await loadAdminVPS();
+        else await loadCustomerVPS();
+        toast('Rebooting VPS...');
+
+        setTimeout(async () => {
+            await appendConsoleLine(id, `[ONLINE] Boot complete — 24/7 Active`);
+            await updateVPSRecord(id, { status: 'running', uptime: '24/7 Active' });
+            if (isAdmin) await loadAdminVPS();
+            else await loadCustomerVPS();
+            toast('VPS back online 24/7');
+        }, 1200);
+    };
+
+    window.deleteVPS = async function(id) {
+        if (activeSession.role !== 'admin') return;
+        if (isFirebaseReady) {
+            await deleteDoc(doc(db, "vpsList", id));
+        } else {
+            const store = getLocal();
+            store.vpsList = store.vpsList.filter(v => v.id !== id);
+            saveLocal(store);
+        }
+        toast('VPS deleted');
+        await loadAdminVPS();
+    };
+</script>
+</body>
+</html>
