@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flora Cloud | VPS Panel</title>
+  <style>
+    :root {
+      --bg-page: #f3f9fd;
+      --bg-card: #ffffff;
+      --bg-soft: #e8f3fb;
+      --text-main: #0f2436;
+      --text-muted: #526a7e;
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --mint: #059669;
+      --mint-bg: #ecfdf5;
+      --amber: #d97706;
+      --amber-bg: #fffbeb;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --border: #d5e7f4;
+      --shadow: 0 12px 28px rgba(15, 36, 54, 0.06);
+      --radius: 16px;
+      --ease: all 0.25s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+      background: linear-gradient(180deg, #eaf5fc 0%, var(--bg-page) 55%, #ffffff 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.55;
+    }
+
+    .topbar {
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.12rem;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--mint));
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: var(--ease);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-full { width: 100%; }
+    .btn-sm { padding: 6px 10px; font-size: 0.78rem; border-radius: 8px; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+    }
+    .btn-primary:hover { transform: translateY(-1px); }
+
+    .btn-soft {
+      background: var(--bg-soft);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+    }
+
+    .btn-success {
+      background: var(--mint-bg);
+      color: var(--mint);
+      border: 1px solid #a7f3d0;
+    }
+
+    .btn-warn {
+      background: var(--amber-bg);
+      color: var(--amber);
+      border: 1px solid #fde68a;
+    }
+
+    .btn-danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+    }
+
+    .field {
+      margin-bottom: 13px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #c6dfef;
+      background: #f9fcff;
+      color: var(--text-main);
+      font-size: 0.92rem;
+    }
+
+    .alert {
+      display: none;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .auth-box {
+      max-width: 440px;
+      margin: 42px auto;
+      padding: 0 16px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: var(--bg-soft);
+      padding: 5px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 9px;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-card);
+      color: var(--primary);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px 60px;
+      display: none;
+    }
+
+    .container.visible {
+      display: block;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 56px 20px;
+    }
+
+    .empty-state h1 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      color: var(--text-muted);
+      max-width: 460px;
+      margin: 0 auto;
+    }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .spec-tile {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .spec-tile small {
+      display: block;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.76rem;
+    }
+
+    .spec-tile strong {
+      font-size: 0.98rem;
+      word-break: break-word;
+    }
+
+    .status-pill {
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+
+    .st-running { background: var(--mint-bg); color: var(--mint); }
+    .st-stopped { background: var(--danger-bg); color: var(--danger); }
+    .st-restarting { background: var(--amber-bg); color: var(--amber); }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .console-box {
+      background: #0f2436;
+      color: #e0f2fe;
+      border-radius: 12px;
+      padding: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.83rem;
+      max-height: 220px;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--bg-soft);
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== TOP BAR ==================== -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">FC</span>
+        <span>Flora Cloud</span>
+      </div>
+
+      <div id="loggedOutTop" class="nav-actions">
+        <button type="button" class="btn btn-soft btn-sm" onclick="switchAuthTab('login')">Log In</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="switchAuthTab('signup')">Sign In</button>
+      </div>
+
+      <div id="loggedInTop" class="nav-actions" style="display: none;">
+        <span id="sessionBadge" style="font-size: 0.84rem; font-weight: 700; color: var(--text-muted);"></span>
+        <button type="button" class="btn btn-danger btn-sm" onclick="logoutSession()">Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 1. LOG IN & 5-FIELD SIGN IN ==================== -->
+  <section id="authSection" class="auth-box">
+    <div class="card">
+      <div class="tabs">
+        <button id="tabBtnLogin" type="button" class="tab-btn active" onclick="switchAuthTab('login')">Log In</button>
+        <button id="tabBtnSignup" type="button" class="tab-btn" onclick="switchAuthTab('signup')">Sign In</button>
+      </div>
+
+      <div id="authErrorBox" class="alert"></div>
+
+      <!-- Log In Form (admin@flora.com / 12345 opens Admin Panel; customer credentials open Customer Panel) -->
+      <form id="loginForm" onsubmit="handleUnifiedLogin(event)">
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" required placeholder="Enter email" />
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" required placeholder="Enter password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Log In</button>
+      </form>
+
+      <!-- Sign In Form (Email, Username, Password, Confirm Password, Security Password) -->
+      <form id="signupForm" style="display: none;" onsubmit="handleCustomerSignup(event)">
+        <div class="field">
+          <label for="regEmail">Email</label>
+          <input type="email" id="regEmail" required placeholder="you@example.com" />
+        </div>
+        <div class="field">
+          <label for="regUsername">Username</label>
+          <input type="text" id="regUsername" required placeholder="Username" />
+        </div>
+        <div class="field">
+          <label for="regPassword">Password</label>
+          <input type="password" id="regPassword" required placeholder="Password" />
+        </div>
+        <div class="field">
+          <label for="regConfirmPassword">Confirm Password</label>
+          <input type="password" id="regConfirmPassword" required placeholder="Confirm password" />
+        </div>
+        <div class="field">
+          <label for="regSecondaryPassword">Security Password</label>
+          <input type="password" id="regSecondaryPassword" required placeholder="Second security password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ==================== 2. CUSTOMER PANEL ("No VPS Found" -> VPS Controller) ==================== -->
+  <main id="customerDashboard" class="container">
+    <!-- Shown when no VPS has been given yet -->
+    <div id="noVpsBox" class="card empty-state">
+      <h1>No VPS Found</h1>
+      <p>Your account is signed in, and no VPS is assigned yet.</p>
+    </div>
+
+    <!-- Shown once Admin enters custom RAM, Core, Storage & gives VPS -->
+    <div id="activeVpsBox" class="card" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h1 id="vpsTitle" style="font-size: 1.5rem;">Flora VPS</h1>
+          <p id="vpsSubtitle" style="color: var(--text-muted); font-size: 0.88rem;"></p>
+        </div>
+        <span id="vpsStatusPill" class="status-pill st-running">RUNNING</span>
+      </div>
+
+      <div class="specs-grid">
+        <div class="spec-tile"><small>IP Address</small><strong id="vIp">-</strong></div>
+        <div class="spec-tile"><small>RAM</small><strong id="vRam">-</strong></div>
+        <div class="spec-tile"><small>Core (CPU)</small><strong id="vCpu">-</strong></div>
+        <div class="spec-tile"><small>Storage</small><strong id="vStorage">-</strong></div>
+        <div class="spec-tile"><small>OS</small><strong id="vOs">-</strong></div>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn btn-success" onclick="customerPowerAction('running')">Start VPS</button>
+        <button type="button" class="btn btn-warn" onclick="customerPowerAction('restarting')">Restart VPS</button>
+        <button type="button" class="btn btn-danger" onclick="customerPowerAction('stopped')">Stop VPS</button>
+        <button type="button" class="btn btn-soft" onclick="copyCustomerIp()">Copy IP</button>
+        <button type="button" class="btn btn-soft" onclick="clearCustomerLogs()">Clear Console</button>
+      </div>
+
+      <div id="customerConsole" class="console-box"></div>
+    </div>
+  </main>
+
+  <!-- ==================== 3. ADMIN PANEL (Manual RAM / Core / Storage Input) ==================== -->
+  <main id="adminDashboard" class="container">
+    <!-- Give VPS Form (You enter RAM, Core, Storage, IP manually) -->
+    <div class="card">
+      <h2>Give VPS to Customer (Custom RAM &amp; Core)</h2>
+      <form onsubmit="adminAssignVps(event)">
+        <div class="grid-3">
+          <div class="field">
+            <label for="assignEmail">Customer Email</label>
+            <input type="email" id="assignEmail" list="registeredEmailsList" required placeholder="customer@example.com" />
+            <datalist id="registeredEmailsList"></datalist>
+          </div>
+          <div class="field">
+            <label for="assignVpsName">VPS Name / Hostname</label>
+            <input type="text" id="assignVpsName" required placeholder="e.g. flora-vps-1" />
+          </div>
+          <div class="field">
+            <label for="assignIp">IP Address</label>
+            <input type="text" id="assignIp" required placeholder="e.g. 103.21.44.10" />
+          </div>
+          <div class="field">
+            <label for="assignRam">RAM (Enter Manually)</label>
+            <input type="text" id="assignRam" required placeholder="e.g. 4 GB or 6 GB" />
+          </div>
+          <div class="field">
+            <label for="assignCpu">Core / CPU (Enter Manually)</label>
+            <input type="text" id="assignCpu" required placeholder="e.g. 2 Core or 4 vCPU" />
+          </div>
+          <div class="field">
+            <label for="assignStorage">Storage (Enter Manually)</label>
+            <input type="text" id="assignStorage" required placeholder="e.g. 50 GB NVMe" />
+          </div>
+          <div class="field">
+            <label for="assignOs">Operating System</label>
+            <input type="text" id="assignOs" required placeholder="e.g. Ubuntu 24.04" />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Give VPS</button>
+      </form>
+    </div>
+
+    <!-- Customers & Assigned VPS Table -->
+    <div class="card">
+      <h2>Customers &amp; Assigned VPS</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>VPS</th>
+              <th>RAM / Core / Storage</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminCustomersTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Admin Email & Password Settings -->
+    <div class="card">
+      <h2>Admin Login Settings</h2>
+      <form onsubmit="adminUpdateAuth(event)">
+        <div class="grid-3">
+          <div class="field">
+            <label for="setAdminEmail">Admin Email</label>
+            <input type="email" id="setAdminEmail" required />
+          </div>
+          <div class="field">
+            <label for="setAdminPass">Admin Password</label>
+            <input type="text" id="setAdminPass" required />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Admin Login</button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const DB_KEY = 'flora_cloud_clean_db_v3';
+
+    const DEFAULT_DB = {
+      adminAuth: {
+        email: 'admin@flora.com',
+        password: '12345'
+      },
+      users: {},
+      vpsMap: {},
+      session: null
+    };
+
+    let db = loadDb();
+
+    function loadDb() {
+      try {
+        const raw = localStorage.getItem(DB_KEY);
+        if (!raw) return JSON.parse(JSON.stringify(DEFAULT_DB));
+        const parsed = JSON.parse(raw);
+        return {
+          adminAuth: { ...DEFAULT_DB.adminAuth, ...(parsed.adminAuth || {}) },
+          users: parsed.users || {},
+          vpsMap: parsed.vpsMap || {},
+          session: parsed.session || null
+        };
+      } catch (e) {
+        return JSON.parse(JSON.stringify(DEFAULT_DB));
+      }
+    }
+
+    function saveDb() {
+      localStorage.setItem(DB_KEY, JSON.stringify(db));
+    }
+
+    function switchAuthTab(tab) {
+      document.getElementById('authErrorBox').style.display = 'none';
+      document.getElementById('tabBtnLogin').classList.toggle('active', tab === 'login');
+      document.getElementById('tabBtnSignup').classList.toggle('active', tab === 'signup');
+      document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+    }
+
+    function showAuthError(msg) {
+      const box = document.getElementById('authErrorBox');
+      box.textContent = msg;
+      box.style.display = 'block';
+    }
+
+    function handleUnifiedLogin(e) {
+      e.preventDefault();
+      document.getElementById('authErrorBox').style.display = 'none';
+
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const password = document.getElementById('loginPassword').value;
+
+      if (email === db.adminAuth.email.toLowerCase()) {
+        if (password === db.adminAuth.password) {
+          db.session = { role: 'admin', email: db.adminAuth.email };
+          saveDb();
+          e.target.reset();
+          renderApp();
+        } else {
+          showAuthError('Invalid Email or Password.');
+        }
+        return;
+      }
+
+      const user = db.users[email];
+      if (!user || user.password !== password) {
+        showAuthError('Invalid Email or Password.');
+        return;
+      }
+
+      db.session = { role: 'customer', email };
+      saveDb();
+      e.target.reset();
+      renderApp();
+    }
+
+    function handleCustomerSignup(e) {
+      e.preventDefault();
+      document.getElementById('authErrorBox').style.display = 'none';
+
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const username = document.getElementById('regUsername').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('regConfirmPassword').value;
+      const secondaryPassword = document.getElementById('regSecondaryPassword').value;
+
+      if (password !== confirmPassword) {
+        showAuthError('Password and Confirm Password do not match.');
+        return;
+      }
+
+      if (email === db.adminAuth.email.toLowerCase()) {
+        showAuthError('This email is reserved.');
+        return;
+      }
+
+      if (db.users[email]) {
+        showAuthError('Account already exists. Please Log In.');
+        return;
+      }
+
+      db.users[email] = { username, password, secondaryPassword };
+      db.session = { role: 'customer', email };
+      saveDb();
+      e.target.reset();
+      renderApp();
+    }
+
+    function logoutSession() {
+      db.session = null;
+      saveDb();
+      renderApp();
+    }
+
+    function renderApp() {
+      const authSec = document.getElementById('authSection');
+      const custDash = document.getElementById('customerDashboard');
+      const admDash = document.getElementById('adminDashboard');
+      const loggedOutTop = document.getElementById('loggedOutTop');
+      const loggedInTop = document.getElementById('loggedInTop');
+      const sessionBadge = document.getElementById('sessionBadge');
+
+      if (!db.session) {
+        authSec.style.display = 'block';
+        custDash.classList.remove('visible');
+        admDash.classList.remove('visible');
+        loggedOutTop.style.display = 'flex';
+        loggedInTop.style.display = 'none';
+        return;
+      }
+
+      authSec.style.display = 'none';
+      loggedOutTop.style.display = 'none';
+      loggedInTop.style.display = 'flex';
+
+      if (db.session.role === 'admin') {
+        custDash.classList.remove('visible');
+        admDash.classList.add('visible');
+        sessionBadge.textContent = `Admin: ${db.session.email}`;
+        renderAdminDashboard();
+      } else {
+        admDash.classList.remove('visible');
+        custDash.classList.add('visible');
+        const userObj = db.users[db.session.email];
+        const uname = userObj ? userObj.username : db.session.email;
+        sessionBadge.textContent = `${uname} (${db.session.email})`;
+        renderCustomerDashboard(db.session.email);
+      }
+    }
+
+    function renderCustomerDashboard(email) {
+      const vps = db.vpsMap[email];
+      const noVpsBox = document.getElementById('noVpsBox');
+      const activeBox = document.getElementById('activeVpsBox');
+
+      if (!vps) {
+        noVpsBox.style.display = 'block';
+        activeBox.style.display = 'none';
+        return;
+      }
+
+      noVpsBox.style.display = 'none';
+      activeBox.style.display = 'block';
+
+      document.getElementById('vpsTitle').textContent = vps.hostname;
+      document.getElementById('vpsSubtitle').textContent = `Assigned to ${email}`;
+      document.getElementById('vIp').textContent = vps.ip;
+      document.getElementById('vRam').textContent = vps.ram;
+      document.getElementById('vCpu').textContent = vps.cpu;
+      document.getElementById('vStorage').textContent = vps.storage;
+      document.getElementById('vOs').textContent = vps.os;
+
+      const pill = document.getElementById('vpsStatusPill');
+      pill.className = 'status-pill st-' + vps.status;
+      pill.textContent = vps.status.toUpperCase();
+
+      const consoleEl = document.getElementById('customerConsole');
+      consoleEl.innerHTML = (vps.logs || []).map((l) => `<div>${escapeHtml(l)}</div>`).join('');
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    function pushVpsLog(email, line) {
+      const vps = db.vpsMap[email];
+      if (!vps) return;
+      vps.logs = vps.logs || [];
+      vps.logs.push(`[${new Date().toLocaleTimeString()}] ${line}`);
+      saveDb();
+      if (db.session && db.session.role === 'customer' && db.session.email === email) {
+        renderCustomerDashboard(email);
+      }
+    }
+
+    function customerPowerAction(action) {
+      if (!db.session || db.session.role !== 'customer') return;
+      const email = db.session.email;
+      const vps = db.vpsMap[email];
+      if (!vps) return;
+
+      if (action === 'restarting') {
+        vps.status = 'restarting';
+        saveDb();
+        renderCustomerDashboard(email);
+        pushVpsLog(email, 'Restarting VPS...');
+        setTimeout(() => {
+          if (db.vpsMap[email]) {
+            db.vpsMap[email].status = 'running';
+            saveDb();
+            pushVpsLog(email, 'VPS running.');
+          }
+        }, 800);
+        return;
+      }
+
+      vps.status = action;
+      saveDb();
+      pushVpsLog(email, action === 'running' ? 'VPS started.' : 'VPS stopped.');
+    }
+
+    function copyCustomerIp() {
+      if (!db.session) return;
+      const vps = db.vpsMap[db.session.email];
+      if (!vps) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(vps.ip).catch(() => {});
+      }
+      pushVpsLog(db.session.email, `Copied IP: ${vps.ip}`);
+    }
+
+    function clearCustomerLogs() {
+      if (!db.session) return;
+      const email = db.session.email;
+      if (!db.vpsMap[email]) return;
+      db.vpsMap[email].logs = ['[Console] Cleared.'];
+      saveDb();
+      renderCustomerDashboard(email);
+    }
+
+    function renderAdminDashboard() {
+      const userEmails = Object.keys(db.users);
+      const activeVpsEmails = Object.keys(db.vpsMap);
+
+      const dataList = document.getElementById('registeredEmailsList');
+      dataList.innerHTML = userEmails.map((em) => `<option value="${escapeHtml(em)}"></option>`).join('');
+
+      const allEmails = Array.from(new Set([...userEmails, ...activeVpsEmails]));
+      const custTbody = document.getElementById('adminCustomersTable');
+      if (!allEmails.length) {
+        custTbody.innerHTML = '<tr><td colspan="6" style="color: var(--text-muted);">No customers yet.</td></tr>';
+      } else {
+        custTbody.innerHTML = allEmails.map((em) => {
+          const u = db.users[em] || { username: '-' };
+          const v = db.vpsMap[em];
+          return `
+            <tr>
+              <td><strong>${escapeHtml(u.username)}</strong></td>
+              <td>${escapeHtml(em)}</td>
+              <td>${v ? `<strong>${escapeHtml(v.hostname)}</strong> (${escapeHtml(v.ip)})` : '<span style="color: var(--text-muted);">No VPS Found</span>'}</td>
+              <td>${v ? `${escapeHtml(v.ram)} | ${escapeHtml(v.cpu)} | ${escapeHtml(v.storage)}` : '-'}</td>
+              <td>${v ? `<span class="status-pill st-${escapeHtml(v.status)}">${escapeHtml(v.status)}</span>` : '-'}</td>
+              <td>
+                <div class="btn-row" style="margin: 0;">
+                  <button type="button" class="btn btn-primary btn-sm" onclick="quickSelectForAssign('${escapeJs(em)}')">Select</button>
+                  ${v ? `
+                    <button type="button" class="btn btn-success btn-sm" onclick="adminToggleVps('${escapeJs(em)}', 'running')">Start</button>
+                    <button type="button" class="btn btn-warn btn-sm" onclick="adminToggleVps('${escapeJs(em)}', 'stopped')">Stop</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="adminRevokeVps('${escapeJs(em)}')">Remove</button>
+                  ` : ''}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('setAdminEmail').value = db.adminAuth.email;
+      document.getElementById('setAdminPass').value = db.adminAuth.password;
+    }
+
+    function quickSelectForAssign(email) {
+      document.getElementById('assignEmail').value = email;
+      document.getElementById('assignEmail').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function adminAssignVps(e) {
+      e.preventDefault();
+      const email = document.getElementById('assignEmail').value.trim().toLowerCase();
+
+      db.vpsMap[email] = {
+        hostname: document.getElementById('assignVpsName').value.trim(),
+        ip: document.getElementById('assignIp').value.trim(),
+        ram: document.getElementById('assignRam').value.trim(),
+        cpu: document.getElementById('assignCpu').value.trim(),
+        storage: document.getElementById('assignStorage').value.trim(),
+        os: document.getElementById('assignOs').value.trim(),
+        status: 'running',
+        logs: [`[Flora Cloud] VPS assigned to ${email}.`]
+      };
+      saveDb();
+      e.target.reset();
+      renderAdminDashboard();
+      alert(`VPS assigned to ${email}!`);
+    }
+
+    function adminToggleVps(email, status) {
+      if (!db.vpsMap[email]) return;
+      db.vpsMap[email].status = status;
+      pushVpsLog(email, `Admin set status to ${status.toUpperCase()}.`);
+      saveDb();
+      renderAdminDashboard();
+    }
+
+    function adminRevokeVps(email) {
+      delete db.vpsMap[email];
+      saveDb();
+      renderAdminDashboard();
+    }
+
+    function adminUpdateAuth(e) {
+      e.preventDefault();
+      const newEmail = document.getElementById('setAdminEmail').value.trim().toLowerCase();
+      const newPass = document.getElementById('setAdminPass').value;
+      db.adminAuth = { email: newEmail, password: newPass };
+      if (db.session && db.session.role === 'admin') {
+        db.session.email = newEmail;
+      }
+      saveDb();
+      renderApp();
+      alert('Admin login updated.');
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function escapeJs(s) {
+      return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    renderApp();
+  </script>
+</body>
+</html>
