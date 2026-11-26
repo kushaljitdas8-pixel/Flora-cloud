@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flora VPS — Cloud &amp; Host Control Panel</title>
+  <style>
+    :root {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-alt: #F1F5F9;
+      --text: #0F172A;
+      --muted: #475569;
+      --border: #E2E8F0;
+      --emerald: #10B981;
+      --emerald-dark: #059669;
+      --emerald-soft: #ECFDF5;
+      --emerald-border: #A7F3D0;
+      --amber: #D97706;
+      --amber-soft: #FFFBEB;
+      --amber-border: #FDE68A;
+      --red: #DC2626;
+      --red-soft: #FEF2F2;
+      --red-border: #FECACA;
+      --blue: #0284C7;
+      --blue-soft: #F0F9FF;
+      --radius: 14px;
+      --shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+      --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.85); }
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 16px 14px 64px;
+    }
+
+    .anim { animation: fadeSlideIn 0.26s ease both; }
+    .container { max-width: 1180px; margin: 0 auto; }
+
+    /* Auth Screen */
+    .auth-shell {
+      max-width: 430px;
+      margin: 40px auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 1rem;
+      display: grid;
+      place-items: center;
+      letter-spacing: 0.5px;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28);
+    }
+
+    .brand h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
+    .brand span { display: block; font-size: 0.82rem; color: var(--muted); }
+
+    .auth-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 4px;
+      margin-bottom: 18px;
+    }
+
+    .auth-tab {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.86rem;
+      padding: 9px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .auth-tab.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Forms & Controls */
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    .field input, .field select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: var(--text);
+      background: var(--surface);
+      transition: var(--transition);
+    }
+
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: var(--emerald);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      margin-bottom: 14px;
+    }
+
+    .toggle-row span { font-size: 0.85rem; font-weight: 700; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(0.98); }
+    .btn-block { width: 100%; }
+    .btn-sm { padding: 7px 11px; font-size: 0.79rem; border-radius: 8px; }
+
+    .btn-emerald { background: var(--emerald); color: #FFFFFF; }
+    .btn-emerald:hover { background: var(--emerald-dark); }
+    .btn-outline { background: var(--surface); color: var(--text); border-color: var(--border); }
+    .btn-outline:hover { background: var(--surface-alt); }
+    .btn-soft-emerald { background: var(--emerald-soft); color: var(--emerald-dark); border-color: var(--emerald-border); }
+    .btn-amber { background: var(--amber-soft); color: var(--amber); border-color: var(--amber-border); }
+    .btn-red { background: var(--red-soft); color: var(--red); border-color: var(--red-border); }
+
+    .alert {
+      display: none;
+      padding: 10px 13px;
+      border-radius: 10px;
+      font-size: 0.83rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .alert-err { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-border); }
+    .alert-ok { background: var(--emerald-soft); color: var(--emerald-dark); border: 1px solid var(--emerald-border); }
+
+    /* Top Navigation Bar */
+    .topbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-title { font-size: 1.05rem; font-weight: 800; }
+    .topbar-sub { font-size: 0.81rem; color: var(--muted); }
+    .topbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* Cards & Grids */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .card-head h2 { font-size: 1.08rem; font-weight: 800; }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .metric-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .metric-box small {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+
+    .metric-box strong {
+      display: block;
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-top: 4px;
+      color: var(--text);
+    }
+
+    /* Progress Bars */
+    .bar-track {
+      width: 100%;
+      height: 7px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--emerald);
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .dot-pulse { animation: pulseDot 1.6s infinite ease-in-out; }
+
+    .b-online { background: var(--emerald-soft); color: var(--emerald-dark); border: 1px solid var(--emerald-border); }
+    .b-restarting { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber-border); }
+    .b-offline, .b-suspended { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-border); }
+    .b-role { background: var(--blue-soft); color: var(--blue); border: 1px solid #BAE6FD; }
+
+    /* Tables */
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td {
+      text-align: left;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    th {
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    tr:hover td { background: #FAFDFC; }
+
+    .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* Host Cards */
+    .host-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      transition: var(--transition);
+    }
+
+    .host-item:hover { border-color: var(--emerald-border); }
+    .host-meta { font-size: 0.8rem; color: var(--muted); margin-top: 3px; }
+    .code-pill {
+      display: inline-block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.78rem;
+      color: var(--text);
+    }
+
+    /* Large Interactive Command Console */
+    .console-shell {
+      border: 1px solid #1E293B;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0B1220;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.14);
+    }
+
+    .console-output {
+      min-height: 380px;
+      max-height: 440px;
+      overflow-y: auto;
+      padding: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.83rem;
+      line-height: 1.6;
+      color: #E2E8F0;
+    }
+
+    .log-line { margin-bottom: 4px; word-break: break-word; }
+    .log-ts { color: #64748B; margin-right: 6px; }
+    .tag-info { color: #38BDF8; font-weight: 700; }
+    .tag-sys { color: #34D399; font-weight: 700; }
+    .tag-host { color: #FBBF24; font-weight: 700; }
+    .tag-err { color: #F87171; font-weight: 700; }
+
+    .console-bar {
+      display: flex;
+      align-items: center;
+      background: #111A2E;
+      border-top: 1px solid #1E293B;
+      padding: 10px 12px;
+      gap: 8px;
+    }
+
+    .console-prompt {
+      color: #10B981;
+      font-family: ui-monospace, monospace;
+      font-weight: 800;
+      font-size: 0.92rem;
+    }
+
+    .console-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #F8FAFC;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.88rem;
+      padding: 6px 4px;
+    }
+
+    .console-input:focus { outline: none; }
+
+    /* Modal for Editing VPS */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.48);
+      backdrop-filter: blur(2px);
+      z-index: 50;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .modal-card {
+      max-width: 520px;
+      margin: 40px auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      background: var(--bg);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+    }
+
+    .empty-state h3 { color: var(--text); font-size: 1.02rem; margin-bottom: 6px; }
+
+    .bridge-strip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. AUTHENTICATION VIEW -->
+  <div id="authSection" class="auth-shell anim">
+    <div class="brand">
+      <div class="brand-icon">FV</div>
+      <div>
+        <h1>Flora VPS Panel</h1>
+        <span>Cloud Compute &amp; Host Infrastructure</span>
+      </div>
+    </div>
+
+    <div class="auth-switch">
+      <button id="loginTabBtn" class="auth-tab active" type="button" onclick="switchAuthTab('login')">Login</button>
+      <button id="signupTabBtn" class="auth-tab" type="button" onclick="switchAuthTab('signup')">Sign Up</button>
+    </div>
+
+    <div id="authAlert" class="alert"></div>
+
+    <form id="loginForm" autocomplete="off" onsubmit="handleLogin(event)">
+      <div class="field">
+        <label for="loginEmail">Email Address</label>
+        <input id="loginEmail" type="email" required placeholder="Enter email" />
+      </div>
+      <div class="field">
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" required minlength="6" placeholder="Enter password" />
+      </div>
+      <button class="btn btn-emerald btn-block" type="submit">Log In to Panel</button>
+    </form>
+
+    <form id="signupForm" style="display:none;" autocomplete="off" onsubmit="handleSignup(event)">
+      <div class="field">
+        <label for="signupName">Account Name</label>
+        <input id="signupName" type="text" required minlength="2" placeholder="Your name or studio" />
+      </div>
+      <div class="field">
+        <label for="signupEmail">Customer Email Address</label>
+        <input id="signupEmail" type="email" required placeholder="customer@example.com" />
+      </div>
+      <div class="field">
+        <label for="signupPassword">Password (min 6 characters)</label>
+        <input id="signupPassword" type="password" required minlength="6" placeholder="Create strong password" />
+      </div>
+      <button class="btn btn-emerald btn-block" type="submit">Register Customer Account</button>
+    </form>
+  </div>
+
+  <!-- 2. APPLICATION ROOT (Populated strictly by verified role) -->
+  <div id="appRoot" class="container" style="display:none;"></div>
+
+  <!-- 3. ADMIN EDIT VPS MODAL -->
+  <div id="editModal" class="modal-backdrop">
+    <div class="modal-card anim">
+      <div class="card-head">
+        <h2>Modify VPS Hardware &amp; Status</h2>
+        <button class="btn btn-outline btn-sm" type="button" onclick="closeEditModal()">Close</button>
+      </div>
+      <form onsubmit="saveVpsEdit(event)">
+        <input id="editVpsId" type="hidden" />
+        <div class="grid-3">
+          <div class="field">
+            <label for="editCpu">vCPU Cores</label>
+            <input id="editCpu" type="number" min="1" max="128" required />
+          </div>
+          <div class="field">
+            <label for="editRam">RAM (MB)</label>
+            <input id="editRam" type="number" min="256" step="256" required />
+          </div>
+          <div class="field">
+            <label for="editDisk">NVMe Disk (GB)</label>
+            <input id="editDisk" type="number" min="5" required />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="editIpPort">Allocated IP:Port</label>
+            <input id="editIpPort" type="text" required />
+          </div>
+          <div class="field">
+            <label for="editBandwidth">Bandwidth Limit (TB)</label>
+            <input id="editBandwidth" type="number" min="1" required />
+          </div>
+        </div>
+        <div class="toggle-row">
+          <span>24/7 Auto-Restart Watchdog</span>
+          <input id="editAutoRestart" type="checkbox" style="width:18px; height:18px; accent-color:#10B981;" />
+        </div>
+        <button class="btn btn-emerald btn-block" type="submit">Apply Hardware Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Admin credentials
+    const ADMIN_EMAIL = "admin@floravps.com";
+    const ADMIN_PASSWORD = "FloraAdmin#2026";
+
+    // Default VPS shell bridge settings (wired directly to console)
+    const BRIDGE_DEFAULTS = {
+      url: "",
+      key: "flora-secret-2026",
+      liveExec: false
+    };
+
+    const DB_KEYS = {
+      USERS: "flora_vps_users_v4",
+      VPS: "flora_vps_instances_v4",
+      SESSION: "flora_vps_session_v4",
+      BRIDGE: "flora_vps_bridge_v4"
+    };
+
+    async function sha256Hex(plain) {
+      const data = new TextEncoder().encode(plain);
+      const digest = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(digest))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    const Store = {
+      getUsers() {
+        return JSON.parse(localStorage.getItem(DB_KEYS.USERS) || "{}");
+      },
+      saveUsers(users) {
+        localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
+      },
+      getVpsList() {
+        return JSON.parse(localStorage.getItem(DB_KEYS.VPS) || "[]");
+      },
+      saveVpsList(list) {
+        localStorage.setItem(DB_KEYS.VPS, JSON.stringify(list));
+      },
+      getSession() {
+        return JSON.parse(sessionStorage.getItem(DB_KEYS.SESSION) || "null");
+      },
+      setSession(sess) {
+        if (!sess) sessionStorage.removeItem(DB_KEYS.SESSION);
+        else sessionStorage.setItem(DB_KEYS.SESSION, JSON.stringify(sess));
+      },
+      getBridge() {
+        return { ...BRIDGE_DEFAULTS, ...JSON.parse(localStorage.getItem(DB_KEYS.BRIDGE) || "{}") };
+      },
+      saveBridge(cfg) {
+        localStorage.setItem(DB_KEYS.BRIDGE, JSON.stringify(cfg));
+      }
+    };
+
+    let currentSession = Store.getSession();
+    let bridgeConfig = Store.getBridge();
+    let selectedCustomerVpsId = null;
+    let commandHistory = [];
+    let historyCursor = -1;
+    let telemetryTimer = null;
+
+    function requireAdmin() {
+      if (!currentSession || currentSession.role !== "admin") {
+        throw new Error("SECURITY_DENIED: Admin privileges required.");
+      }
+    }
+
+    function requireCustomer() {
+      if (!currentSession || currentSession.role !== "customer") {
+        throw new Error("SECURITY_DENIED: Customer session required.");
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function formatRam(mb) {
+      return mb >= 1024 ? `${(mb / 1024).toFixed(mb % 1024 === 0 ? 0 : 1)} GB` : `${mb} MB`;
+    }
+
+    function nowStamp() {
+      return new Date().toTimeString().split(" ")[0];
+    }
+
+    function switchAuthTab(tab) {
+      const alertBox = document.getElementById("authAlert");
+      alertBox.style.display = "none";
+      const isLogin = tab === "login";
+      document.getElementById("loginForm").style.display = isLogin ? "block" : "none";
+      document.getElementById("signupForm").style.display = isLogin ? "none" : "block";
+      document.getElementById("loginTabBtn").classList.toggle("active", isLogin);
+      document.getElementById("signupTabBtn").classList.toggle("active", !isLogin);
+    }
+
+    function showAuthAlert(msg, isError) {
+      const box = document.getElementById("authAlert");
+      box.className = "alert " + (isError ? "alert-err" : "alert-ok");
+      box.textContent = msg;
+      box.style.display = "block";
+    }
+
+    async function handleSignup(e) {
+      e.preventDefault();
+      const name = document.getElementById("signupName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim().toLowerCase();
+      const pass = document.getElementById("signupPassword").value;
+
+      if (email === ADMIN_EMAIL.toLowerCase()) {
+        showAuthAlert("This email address is reserved.", true);
+        return;
+      }
+
+      const users = Store.getUsers();
+      if (users[email]) {
+        showAuthAlert("An account with this email already exists. Please log in.", true);
+        return;
+      }
+
+      const passwordHash = await sha256Hex(pass);
+      users[email] = {
+        name,
+        email,
+        passwordHash,
+        role: "customer",
+        createdAt: new Date().toISOString()
+      };
+      Store.saveUsers(users);
+
+      document.getElementById("signupForm").reset();
+      document.getElementById("loginEmail").value = email;
+      switchAuthTab("login");
+      showAuthAlert("Customer account registered. Please log in.", false);
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+      const pass = document.getElementById("loginPassword").value;
+
+      if (email === ADMIN_EMAIL.toLowerCase()) {
+        if (pass !== ADMIN_PASSWORD) {
+          showAuthAlert("Invalid email or password.", true);
+          return;
+        }
+        currentSession = {
+          email: ADMIN_EMAIL.toLowerCase(),
+          name: "Flora Administrator",
+          role: "admin"
+        };
+        Store.setSession(currentSession);
+        document.getElementById("loginPassword").value = "";
+        renderApp();
+        return;
+      }
+
+      const inputHash = await sha256Hex(pass);
+      const users = Store.getUsers();
+      const user = users[email];
+      if (!user || user.passwordHash !== inputHash || user.role !== "customer") {
+        showAuthAlert("Invalid email or password.", true);
+        return;
+      }
+
+      currentSession = {
+        email: user.email,
+        name: user.name,
+        role: "customer"
+      };
+      Store.setSession(currentSession);
+      document.getElementById("loginPassword").value = "";
+      renderApp();
+    }
+
+    function handleLogout() {
+      if (telemetryTimer) clearInterval(telemetryTimer);
+      currentSession = null;
+      selectedCustomerVpsId = null;
+      Store.setSession(null);
+      renderApp();
+    }
+
+    // ADMIN PANEL FUNCTIONS
+    function createCustomVps(e) {
+      e.preventDefault();
+      requireAdmin();
+
+      const customerEmail = document.getElementById("admCustEmail").value.trim().toLowerCase();
+      const vpsName = document.getElementById("admVpsName").value.trim();
+      const hostname = document.getElementById("admHostname").value.trim();
+      const cpu = parseInt(document.getElementById("admCpu").value, 10);
+      const ram = parseInt(document.getElementById("admRam").value, 10);
+      const disk = parseInt(document.getElementById("admDisk").value, 10);
+      const bandwidth = parseInt(document.getElementById("admBandwidth").value, 10);
+      const ipPort = document.getElementById("admIpPort").value.trim();
+      const location = document.getElementById("admLocation").value;
+      const autoRestart = document.getElementById("admAutoRestart").checked;
+
+      const list = Store.getVpsList();
+      const newVps = {
+        id: "vps-" + Date.now().toString(36),
+        customerEmail,
+        vpsName,
+        hostname,
+        cpu,
+        ram,
+        disk,
+        bandwidth,
+        ipPort,
+        location,
+        autoRestart,
+        status: "online",
+        os: "Ubuntu 24.04 LTS",
+        usage: { cpuPct: 14, ramPct: 28, diskPct: 12 },
+        hosts: [],
+        logs: [
+          { ts: nowStamp(), tag: "SYSTEM", msg: `Provisioned ${vpsName} (${cpu} vCPU, ${formatRam(ram)}, ${disk}GB NVMe) in ${location}.` },
+          { ts: nowStamp(), tag: "INFO", msg: `Network interface bound to ${ipPort}. 24/7 Watchdog: ${autoRestart ? "ENABLED" : "DISABLED"}.` }
+        ]
+      };
+
+      list.unshift(newVps);
+      Store.saveVpsList(list);
+      e.target.reset();
+      document.getElementById("admAutoRestart").checked = true;
+      renderAdminDashboard("VPS provisioned and assigned to " + customerEmail);
+    }
+
+    function openEditModal(vpsId) {
+      requireAdmin();
+      const vps = Store.getVpsList().find(v => v.id === vpsId);
+      if (!vps) return;
+      document.getElementById("editVpsId").value = vps.id;
+      document.getElementById("editCpu").value = vps.cpu;
+      document.getElementById("editRam").value = vps.ram;
+      document.getElementById("editDisk").value = vps.disk;
+      document.getElementById("editIpPort").value = vps.ipPort;
+      document.getElementById("editBandwidth").value = vps.bandwidth;
+      document.getElementById("editAutoRestart").checked = vps.autoRestart;
+      document.getElementById("editModal").style.display = "block";
+    }
+
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+
+    function saveVpsEdit(e) {
+      e.preventDefault();
+      requireAdmin();
+      const id = document.getElementById("editVpsId").value;
+      const list = Store.getVpsList();
+      const vps = list.find(v => v.id === id);
+      if (!vps) return;
+
+      vps.cpu = parseInt(document.getElementById("editCpu").value, 10);
+      vps.ram = parseInt(document.getElementById("editRam").value, 10);
+      vps.disk = parseInt(document.getElementById("editDisk").value, 10);
+      vps.ipPort = document.getElementById("editIpPort").value.trim();
+      vps.bandwidth = parseInt(document.getElementById("editBandwidth").value, 10);
+      vps.autoRestart = document.getElementById("editAutoRestart").checked;
+      vps.logs.push({
+        ts: nowStamp(),
+        tag: "SYSTEM",
+        msg: `Hardware reconfigured by Admin: ${vps.cpu} vCPU, ${formatRam(vps.ram)}, ${vps.disk}GB NVMe.`
+      });
+
+      Store.saveVpsList(list);
+      closeEditModal();
+      renderAdminDashboard("Updated hardware allocation for " + vps.vpsName);
+    }
+
+    function toggleSuspendVps(vpsId) {
+      requireAdmin();
+      const list = Store.getVpsList();
+      const vps = list.find(v => v.id === vpsId);
+      if (!vps) return;
+
+      if (vps.status === "suspended") {
+        vps.status = "online";
+        vps.logs.push({ ts: nowStamp(), tag: "SYSTEM", msg: "Instance unsuspended by Administrator. Node Online." });
+      } else {
+        vps.status = "suspended";
+        vps.hosts.forEach(h => { h.running = false; });
+        vps.logs.push({ ts: nowStamp(), tag: "ERR", msg: "Instance suspended by Administrator. All hosts halted." });
+      }
+      Store.saveVpsList(list);
+      renderAdminDashboard();
+    }
+
+    function deleteVpsNode(vpsId) {
+      requireAdmin();
+      const list = Store.getVpsList().filter(v => v.id !== vpsId);
+      Store.saveVpsList(list);
+      renderAdminDashboard("VPS node removed.");
+    }
+
+    function renderAdminDashboard(noticeMsg) {
+      requireAdmin();
+      const root = document.getElementById("appRoot");
+      const vpsList = Store.getVpsList();
+      const users = Store.getUsers();
+
+      const totalCpu = vpsList.reduce((acc, v) => acc + v.cpu, 0);
+      const totalRam = vpsList.reduce((acc, v) => acc + v.ram, 0);
+      const active247 = vpsList.filter(v => v.status === "online" && v.autoRestart).length;
+      const totalHosts = vpsList.reduce((acc, v) => acc + v.hosts.length, 0);
+
+      root.innerHTML = `
+        <div class="topbar anim">
+          <div class="topbar-left">
+            <div class="brand-icon">FV</div>
+            <div>
+              <div class="topbar-title">Flora VPS — Owner Control Center</div>
+              <div class="topbar-sub">${escapeHtml(currentSession.email)} &bull; ${Object.keys(users).length} Registered Customers</div>
+            </div>
+          </div>
+          <div class="topbar-right">
+            <span class="badge b-role">Admin Role</span>
+            <button class="btn btn-red btn-sm" type="button" onclick="handleLogout()">Log Out</button>
+          </div>
+        </div>
+
+        ${noticeMsg ? `<div class="alert alert-ok" style="display:block;">${escapeHtml(noticeMsg)}</div>` : ""}
+
+        <div class="grid-4 anim">
+          <div class="metric-box">
+            <small>Total Allocated vCPU</small>
+            <strong>${totalCpu} Cores</strong>
+          </div>
+          <div class="metric-box">
+            <small>Total Allocated RAM</small>
+            <strong>${formatRam(totalRam)}</strong>
+          </div>
+          <div class="metric-box">
+            <small>Active 24/7 VPS Nodes</small>
+            <strong>${active247} / ${vpsList.length}</strong>
+          </div>
+          <div class="metric-box">
+            <small>Customer Deployed Hosts</small>
+            <strong>${totalHosts} Hosts</strong>
+          </div>
+        </div>
+
+        <div class="card anim">
+          <div class="card-head">
+            <h2>Custom VPS Resource Creator (Manual Assignment)</h2>
+          </div>
+          <form onsubmit="createCustomVps(event)">
+            <div class="grid-3">
+              <div class="field">
+                <label for="admCustEmail">Customer Email Assignment</label>
+                <input id="admCustEmail" type="email" required placeholder="customer@example.com" />
+              </div>
+              <div class="field">
+                <label for="admVpsName">VPS Instance Name</label>
+                <input id="admVpsName" type="text" required placeholder="e.g. Flora-Node-01" />
+              </div>
+              <div class="field">
+                <label for="admHostname">System Hostname</label>
+                <input id="admHostname" type="text" required placeholder="node01.floravps.cloud" />
+              </div>
+              <div class="field">
+                <label for="admCpu">vCPU Cores</label>
+                <input id="admCpu" type="number" min="1" max="128" value="4" required />
+              </div>
+              <div class="field">
+                <label for="admRam">RAM Allocation (MB)</label>
+                <input id="admRam" type="number" min="256" step="256" value="8192" required />
+              </div>
+              <div class="field">
+                <label for="admDisk">NVMe Disk Storage (GB)</label>
+                <input id="admDisk" type="number" min="5" value="80" required />
+              </div>
+              <div class="field">
+                <label for="admBandwidth">Bandwidth Limit (TB)</label>
+                <input id="admBandwidth" type="number" min="1" value="5" required />
+              </div>
+              <div class="field">
+                <label for="admIpPort">Allocated IP:Port</label>
+                <input id="admIpPort" type="text" required placeholder="198.51.100.42:25565" />
+              </div>
+              <div class="field">
+                <label for="admLocation">Node Location</label>
+                <select id="admLocation">
+                  <option value="Mumbai, IN (Asia-South)">Mumbai, IN (Asia-South)</option>
+                  <option value="Singapore (AP-Southeast)">Singapore (AP-Southeast)</option>
+                  <option value="Frankfurt, DE (EU-Central)">Frankfurt, DE (EU-Central)</option>
+                  <option value="New York, US (US-East)">New York, US (US-East)</option>
+                </select>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <span>Enable 24/7 Auto-Restart &amp; Uptime Guard</span>
+              <input id="admAutoRestart" type="checkbox" checked style="width:18px; height:18px; accent-color:#10B981;" />
+            </div>
+            <button class="btn btn-emerald" type="submit">Provision &amp; Assign VPS</button>
+          </form>
+        </div>
+
+        <div class="card anim">
+          <div class="card-head">
+            <h2>Active Customer VPS Instances (${vpsList.length})</h2>
+          </div>
+          ${vpsList.length === 0 ? `
+            <div class="empty-state">
+              <h3>No VPS Instances Provisioned</h3>
+              <p>Use the Custom VPS Resource Creator above to assign hardware to a customer email.</p>
+            </div>
+          ` : `
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>VPS / Hostname</th>
+                    <th>Assigned Customer</th>
+                    <th>Hardware Specs</th>
+                    <th>Endpoint &amp; Location</th>
+                    <th>Hosts</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${vpsList.map(v => `
+                    <tr>
+                      <td>
+                        <strong>${escapeHtml(v.vpsName)}</strong><br/>
+                        <span class="code-pill">${escapeHtml(v.hostname)}</span>
+                      </td>
+                      <td>${escapeHtml(v.customerEmail)}</td>
+                      <td>
+                        <strong>${v.cpu} vCPU</strong> &bull; ${formatRam(v.ram)}<br/>
+                        <span style="color:var(--muted); font-size:0.79rem;">${v.disk} GB NVMe &bull; ${v.bandwidth} TB BW</span>
+                      </td>
+                      <td>
+                        <span class="code-pill">${escapeHtml(v.ipPort)}</span><br/>
+                        <span style="color:var(--muted); font-size:0.79rem;">${escapeHtml(v.location)}</span>
+                      </td>
+                      <td><strong>${v.hosts.length}</strong></td>
+                      <td>
+                        <span class="badge ${v.status === 'online' ? 'b-online' : v.status === 'suspended' ? 'b-suspended' : 'b-offline'}">
+                          <span class="dot ${v.status === 'online' ? 'dot-pulse' : ''}"></span>
+                          ${v.status === 'online' && v.autoRestart ? '24/7 ONLINE' : v.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="btn-group">
+                          <button class="btn btn-outline btn-sm" type="button" onclick="openEditModal('${v.id}')">Edit</button>
+                          <button class="btn ${v.status === 'suspended' ? 'btn-soft-emerald' : 'btn-amber'} btn-sm" type="button" onclick="toggleSuspendVps('${v.id}')">
+                            ${v.status === 'suspended' ? 'Unsuspend' : 'Suspend'}
+                          </button>
+                          <button class="btn btn-red btn-sm" type="button" onclick="deleteVpsNode('${v.id}')">Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    // CUSTOMER PANEL FUNCTIONS
+    function getCustomerVpsList() {
+      requireCustomer();
+      return Store.getVpsList().filter(v => v.customerEmail === currentSession.email);
+    }
+
+    function getActiveCustomerVps() {
+      const mine = getCustomerVpsList();
+      if (mine.length === 0) return null;
+      const found = mine.find(v => v.id === selectedCustomerVpsId);
+      if (found) return found;
+      selectedCustomerVpsId = mine[0].id;
+      return mine[0];
+    }
+
+    function mutateCustomerVps(vpsId, mutatorFn) {
+      requireCustomer();
+      const all = Store.getVpsList();
+      const target = all.find(v => v.id === vpsId && v.customerEmail === currentSession.email);
+      if (!target) return null;
+      mutatorFn(target);
+      if (target.logs.length > 160) target.logs = target.logs.slice(-160);
+      Store.saveVpsList(all);
+      return target;
+    }
+
+    function selectCustomerVps(vpsId) {
+      selectedCustomerVpsId = vpsId;
+      renderCustomerDashboard();
+    }
+
+    function saveBridgeSettings() {
+      const urlEl = document.getElementById("bridgeUrlInp");
+      const keyEl = document.getElementById("bridgeKeyInp");
+      const liveEl = document.getElementById("bridgeLiveChk");
+      bridgeConfig = {
+        url: (urlEl ? urlEl.value : "").trim().replace(/\/+$/, ""),
+        key: (keyEl ? keyEl.value : "").trim() || BRIDGE_DEFAULTS.key,
+        liveExec: Boolean(liveEl && liveEl.checked && (urlEl ? urlEl.value.trim() : ""))
+      };
+      Store.saveBridge(bridgeConfig);
+      const vps = getActiveCustomerVps();
+      if (vps) {
+        mutateCustomerVps(vps.id, v => {
+          v.logs.push({
+            ts: nowStamp(),
+            tag: "SYSTEM",
+            msg: bridgeConfig.liveExec
+              ? `Live VPS bridge enabled -> ${bridgeConfig.url}/api/run`
+              : "Console running in built-in VPS terminal mode."
+          });
+        });
+      }
+      renderCustomerDashboard();
+    }
+
+    function customerPowerAction(action) {
+      const vps = getActiveCustomerVps();
+      if (!vps) return;
+      if (vps.status === "suspended") {
+        alert("This VPS is suspended by the administrator.");
+        return;
+      }
+
+      if (action === "start") {
+        mutateCustomerVps(vps.id, v => {
+          v.status = "online";
+          v.usage = { cpuPct: 18, ramPct: 34, diskPct: v.usage.diskPct };
+          v.logs.push({ ts: nowStamp(), tag: "SYSTEM", msg: "Boot sequence complete. VPS is now 24/7 ONLINE." });
+        });
+        renderCustomerDashboard();
+      } else if (action === "stop") {
+        mutateCustomerVps(vps.id, v => {
+          v.status = "offline";
+          v.usage = { cpuPct: 0, ramPct: 2, diskPct: v.usage.diskPct };
+          v.hosts.forEach(h => { h.running = false; });
+          v.logs.push({ ts: nowStamp(), tag: "SYSTEM", msg: "Instance powered off cleanly. All child hosts stopped." });
+        });
+        renderCustomerDashboard();
+      } else if (action === "restart") {
+        mutateCustomerVps(vps.id, v => {
+          v.status = "restarting";
+          v.logs.push({ ts: nowStamp(), tag: "SYSTEM", msg: "Initiating warm kernel & container reboot..." });
+        });
+        renderCustomerDashboard();
+        setTimeout(() => {
+          mutateCustomerVps(vps.id, v => {
+            if (v.status === "restarting") {
+              v.status = "online";
+              v.logs.push({ ts: nowStamp(), tag: "INFO", msg: "Reboot completed. 24/7 Watchdog active." });
+            }
+          });
+          if (currentSession && currentSession.role === "customer") renderCustomerDashboard();
+        }, 1200);
+      } else if (action === "reinstall") {
+        if (!confirm("Reinstall OS on " + vps.vpsName + "? Running hosts will be stopped.")) return;
+        mutateCustomerVps(vps.id, v => {
+          v.status = "online";
+          v.hosts.forEach(h => { h.running = false; });
+          v.usage = { cpuPct: 9, ramPct: 16, diskPct: 8 };
+          v.logs.push({ ts: nowStamp(), tag: "SYSTEM", msg: `Fresh ${v.os} image deployed cleanly.` });
+        });
+        renderCustomerDashboard();
+      }
+    }
+
+    function createCustomerHost(e) {
+      e.preventDefault();
+      const vps = getActiveCustomerVps();
+      if (!vps) return;
+      if (vps.status === "suspended") {
+        alert("Cannot deploy hosts while VPS is suspended.");
+        return;
+      }
+
+      const name = document.getElementById("hostNameInp").value.trim();
+      const runtime = document.getElementById("hostRuntimeInp").value;
+      const port = parseInt(document.getElementById("hostPortInp").value, 10);
+      const startupCmd = document.getElementById("hostCmdInp").value.trim();
+      const baseIp = vps.ipPort.split(":")[0];
+
+      mutateCustomerVps(vps.id, v => {
+        const hostObj = {
+          id: "host-" + Date.now().toString(36),
+          name,
+          runtime,
+          port,
+          endpoint: `${baseIp}:${port}`,
+          startupCmd,
+          running: v.status === "online"
+        };
+        v.hosts.push(hostObj);
+        v.usage.ramPct = Math.min(94, v.usage.ramPct + 12);
+        v.usage.cpuPct = Math.min(92, v.usage.cpuPct + 9);
+        v.logs.push({
+          ts: nowStamp(),
+          tag: "HOST",
+          msg: `Deployed '${name}' (${runtime}) on ${hostObj.endpoint} -> Exec: ${startupCmd}`
+        });
+      });
+
+      e.target.reset();
+      renderCustomerDashboard();
+    }
+
+    function toggleHostPower(hostId) {
+      const vps = getActiveCustomerVps();
+      if (!vps) return;
+      if (vps.status !== "online") {
+        alert("Start your VPS first before starting hosts.");
+        return;
+      }
+
+      mutateCustomerVps(vps.id, v => {
+        const h = v.hosts.find(item => item.id === hostId);
+        if (!h) return;
+        h.running = !h.running;
+        v.logs.push({
+          ts: nowStamp(),
+          tag: "HOST",
+          msg: h.running
+            ? `[${h.name}] Started on ${h.endpoint} (${h.startupCmd})`
+            : `[${h.name}] Process stopped.`
+        });
+      });
+      renderCustomerDashboard();
+    }
+
+    function removeCustomerHost(hostId) {
+      const vps = getActiveCustomerVps();
+      if (!vps) return;
+      mutateCustomerVps(vps.id, v => {
+        const h = v.hosts.find(item => item.id === hostId);
+        v.hosts = v.hosts.filter(item => item.id !== hostId);
+        if (h) {
+          v.logs.push({ ts: nowStamp(), tag: "HOST", msg: `Removed host '${h.name}' and released port ${h.port}.` });
+        }
+      });
+      renderCustomerDashboard();
+    }
+
+    async function runConsoleCommand(e) {
+      e.preventDefault();
+      const inputEl = document.getElementById("consoleCmdInput");
+      const raw = inputEl.value.trim();
+      if (!raw) return;
+
+      commandHistory.push(raw);
+      historyCursor = commandHistory.length;
+      inputEl.value = "";
+
+      const vps = getActiveCustomerVps();
+      if (!vps) return;
+
+      const cmd = raw.toLowerCase();
+
+      if (cmd === "clear") {
+        mutateCustomerVps(vps.id, v => { v.logs = []; });
+        renderCustomerDashboard();
+        return;
+      }
+
+      if (bridgeConfig.liveExec && bridgeConfig.url) {
+        mutateCustomerVps(vps.id, v => {
+          v.logs.push({ ts: nowStamp(), tag: "INFO", msg: `$ ${raw}` });
+        });
+        renderCustomerDashboard();
+        try {
+          const resp = await fetch(`${bridgeConfig.url}/api/run`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key: bridgeConfig.key, command: raw })
+          });
+          const data = await resp.json();
+          mutateCustomerVps(vps.id, v => {
+            v.logs.push({
+              ts: nowStamp(),
+              tag: data.ok ? "SYSTEM" : "ERR",
+              msg: data.output || "Command completed."
+            });
+          });
+        } catch (err) {
+          mutateCustomerVps(vps.id, v => {
+            v.logs.push({ ts: nowStamp(), tag: "ERR", msg: "VPS bridge error: " + err.message });
+          });
+        }
+        renderCustomerDashboard();
+        return;
+      }
+
+      mutateCustomerVps(vps.id, v => {
+        v.logs.push({ ts: nowStamp(), tag: "INFO", msg: `$ ${raw}` });
+
+        if (cmd === "help") {
+          v.logs.push({
+            ts: nowStamp(),
+            tag: "SYSTEM",
+            msg: "Commands: help, status, specs, hosts, restart, clear, or any custom shell/game command."
+          });
+        } else if (cmd === "status") {
+          v.logs.push({
+            ts: nowStamp(),
+            tag: "SYSTEM",
+            msg: `State: ${v.status.toUpperCase()} | 24/7 Guard: ${v.autoRestart ? "ON" : "OFF"} | CPU: ${v.usage.cpuPct}% | RAM: ${v.usage.ramPct}%`
+          });
+        } else if (cmd === "specs") {
+          v.logs.push({
+            ts: nowStamp(),
+            tag: "INFO",
+            msg: `Hardware: ${v.cpu} vCPU | ${formatRam(v.ram)} RAM | ${v.disk} GB NVMe | ${v.bandwidth} TB BW | IP: ${v.ipPort}`
+          });
+        } else if (cmd === "hosts") {
+          if (v.hosts.length === 0) {
+            v.logs.push({ ts: nowStamp(), tag: "HOST", msg: "No active hosts deployed inside this VPS." });
+          } else {
+            v.hosts.forEach(h => {
+              v.logs.push({
+                ts: nowStamp(),
+                tag: "HOST",
+                msg: `- ${h.name} [${h.runtime}] -> ${h.endpoint} (${h.running ? "RUNNING" : "STOPPED"})`
+              });
+            });
+          }
+        } else if (cmd === "restart") {
+          v.logs.push({ ts: nowStamp(), tag: "SYSTEM", msg: "Restarting services inside " + v.vpsName + "..." });
+        } else {
+          if (v.status !== "online") {
+            v.logs.push({ ts: nowStamp(), tag: "ERR", msg: "Execution failed: VPS is currently " + v.status.toUpperCase() + "." });
+          } else {
+            const runningHosts = v.hosts.filter(h => h.running);
+            const targetLabel = runningHosts.length > 0 ? runningHosts[0].name : v.hostname;
+            v.logs.push({
+              ts: nowStamp(),
+              tag: "HOST",
+              msg: `[${targetLabel}] Executed '${raw}' -> Exit code 0 (OK)`
+            });
+          }
+        }
+      });
+
+      renderCustomerDashboard();
+    }
+
+    function handleConsoleKeydown(e) {
+      if (e.key === "ArrowUp") {
+        if (historyCursor > 0) {
+          historyCursor--;
+          e.target.value = commandHistory[historyCursor];
+        }
+        e.preventDefault();
+      } else if (e.key === "ArrowDown") {
+        if (historyCursor < commandHistory.length - 1) {
+          historyCursor++;
+          e.target.value = commandHistory[historyCursor];
+        } else {
+          historyCursor = commandHistory.length;
+          e.target.value = "";
+        }
+        e.preventDefault();
+      }
+    }
+
+    function clearConsoleLogs() {
+      const vps = getActiveCustomerVps();
+      if (!vps) return;
+      mutateCustomerVps(vps.id, v => {
+        v.logs = [{ ts: nowStamp(), tag: "SYSTEM", msg: "Console buffer cleared." }];
+      });
+      renderCustomerDashboard();
+    }
+
+    function copyConsoleLogs() {
+      const vps = getActiveCustomerVps();
+      if (!vps) return;
+      const text = vps.logs.map(l => `[${l.ts}] [${l.tag}] ${l.msg}`).join("\n");
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      }
+      mutateCustomerVps(vps.id, v => {
+        v.logs.push({ ts: nowStamp(), tag: "INFO", msg: "Copied console logs to clipboard." });
+      });
+      renderCustomerDashboard();
+    }
+
+    function showCommandHistory() {
+      const vps = getActiveCustomerVps();
+      if (!vps) return;
+      mutateCustomerVps(vps.id, v => {
+        v.logs.push({
+          ts: nowStamp(),
+          tag: "INFO",
+          msg: commandHistory.length
+            ? "Recent commands: " + commandHistory.slice(-8).join(" | ")
+            : "Command history is empty."
+        });
+      });
+      renderCustomerDashboard();
+    }
+
+    function renderCustomerDashboard() {
+      requireCustomer();
+      const root = document.getElementById("appRoot");
+      const myVpsList = getCustomerVpsList();
+      const vps = getActiveCustomerVps();
+
+      root.innerHTML = `
+        <div class="topbar anim">
+          <div class="topbar-left">
+            <div class="brand-icon">FV</div>
+            <div>
+              <div class="topbar-title">Flora VPS — Customer Dashboard</div>
+              <div class="topbar-sub">${escapeHtml(currentSession.name)} (${escapeHtml(currentSession.email)})</div>
+            </div>
+          </div>
+          <div class="topbar-right">
+            ${myVpsList.length > 1 ? `
+              <select class="btn btn-outline btn-sm" onchange="selectCustomerVps(this.value)">
+                ${myVpsList.map(item => `
+                  <option value="${item.id}" ${item.id === vps.id ? "selected" : ""}>${escapeHtml(item.vpsName)} (${escapeHtml(item.ipPort)})</option>
+                `).join("")}
+              </select>
+            ` : ""}
+            <span class="badge b-role">Customer Account</span>
+            <button class="btn btn-red btn-sm" type="button" onclick="handleLogout()">Log Out</button>
+          </div>
+        </div>
+
+        ${!vps ? `
+          <div class="card anim">
+            <div class="empty-state">
+              <h3>No VPS Instance Assigned Yet</h3>
+              <p>Your account (<strong>${escapeHtml(currentSession.email)}</strong>) is active. Once the administrator provisions your custom VPS hardware, your server controls, host builder, and console will appear here automatically.</p>
+            </div>
+          </div>
+        ` : `
+          <div class="card anim">
+            <div class="card-head">
+              <div>
+                <h2>${escapeHtml(vps.vpsName)} <span class="code-pill">${escapeHtml(vps.hostname)}</span></h2>
+                <span style="font-size:0.81rem; color:var(--muted);">${escapeHtml(vps.location)} &bull; ${escapeHtml(vps.os)}</span>
+              </div>
+              <span class="badge ${vps.status === 'online' ? 'b-online' : vps.status === 'restarting' ? 'b-restarting' : 'b-offline'}">
+                <span class="dot ${vps.status === 'online' ? 'dot-pulse' : ''}"></span>
+                ${vps.status === 'online' ? '24/7 ONLINE' : vps.status.toUpperCase()}
+              </span>
+            </div>
+
+            <div class="grid-4">
+              <div class="metric-box">
+                <small>vCPU Cores (${vps.usage.cpuPct}% Load)</small>
+                <strong>${vps.cpu} Cores</strong>
+                <div class="bar-track"><div class="bar-fill" style="width:${vps.usage.cpuPct}%;"></div></div>
+              </div>
+              <div class="metric-box">
+                <small>RAM Allocation (${vps.usage.ramPct}% Used)</small>
+                <strong>${formatRam(vps.ram)}</strong>
+                <div class="bar-track"><div class="bar-fill" style="width:${vps.usage.ramPct}%;"></div></div>
+              </div>
+              <div class="metric-box">
+                <small>NVMe Storage (${vps.usage.diskPct}% Used)</small>
+                <strong>${vps.disk} GB NVMe</strong>
+                <div class="bar-track"><div class="bar-fill" style="width:${vps.usage.diskPct}%;"></div></div>
+              </div>
+              <div class="metric-box">
+                <small>Primary IP &amp; Port</small>
+                <strong style="font-size:1.05rem;">${escapeHtml(vps.ipPort)}</strong>
+                <span style="font-size:0.75rem; color:var(--muted);">${vps.bandwidth} TB Bandwidth</span>
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button class="btn btn-emerald btn-sm" type="button" onclick="customerPowerAction('start')">Start</button>
+              <button class="btn btn-amber btn-sm" type="button" onclick="customerPowerAction('restart')">Restart</button>
+              <button class="btn btn-red btn-sm" type="button" onclick="customerPowerAction('stop')">Stop</button>
+              <button class="btn btn-outline btn-sm" type="button" onclick="customerPowerAction('reinstall')">Reinstall OS</button>
+            </div>
+          </div>
+
+          <div class="grid-2 anim">
+            <div class="card" style="margin-bottom:0;">
+              <div class="card-head">
+                <h2>Create Host Inside VPS</h2>
+              </div>
+              <form onsubmit="createCustomerHost(event)">
+                <div class="field">
+                  <label for="hostNameInp">Host Name</label>
+                  <input id="hostNameInp" type="text" required placeholder="e.g. Survival-SMP or Discord-Bot" />
+                </div>
+                <div class="grid-2">
+                  <div class="field">
+                    <label for="hostRuntimeInp">Host Type / Runtime</label>
+                    <select id="hostRuntimeInp">
+                      <option value="Minecraft / Game Server">Minecraft / Game Server</option>
+                      <option value="Discord / Telegram Bot">Discord / Telegram Bot</option>
+                      <option value="Node.js / Python App">Node.js / Python App</option>
+                      <option value="Custom Web Service">Custom Web Service</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="hostPortInp">Assigned Port</label>
+                    <input id="hostPortInp" type="number" min="1024" max="65535" value="25566" required />
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="hostCmdInp">Startup Command</label>
+                  <input id="hostCmdInp" type="text" required placeholder="java -Xmx2G -jar server.jar" />
+                </div>
+                <button class="btn btn-emerald btn-block" type="submit">Deploy Host</button>
+              </form>
+            </div>
+
+            <div class="card" style="margin-bottom:0;">
+              <div class="card-head">
+                <h2>Deployed Hosts (${vps.hosts.length})</h2>
+              </div>
+              ${vps.hosts.length === 0 ? `
+                <div class="empty-state">
+                  <h3>No Hosts Deployed</h3>
+                  <p>Create a game server, bot, or web host inside your VPS using the form.</p>
+                </div>
+              ` : vps.hosts.map(h => `
+                <div class="host-item">
+                  <div>
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                      <strong>${escapeHtml(h.name)}</strong>
+                      <span class="badge ${h.running ? 'b-online' : 'b-offline'}">${h.running ? 'Online' : 'Stopped'}</span>
+                    </div>
+                    <div class="host-meta">
+                      ${escapeHtml(h.runtime)} &bull; Address: <span class="code-pill">${escapeHtml(h.endpoint)}</span>
+                    </div>
+                    <div class="host-meta">Cmd: <span class="code-pill">${escapeHtml(h.startupCmd)}</span></div>
+                  </div>
+                  <div class="btn-group">
+                    <button class="btn ${h.running ? 'btn-amber' : 'btn-soft-emerald'} btn-sm" type="button" onclick="toggleHostPower('${h.id}')">
+                      ${h.running ? 'Stop' : 'Start'}
+                    </button>
+                    <button class="btn btn-red btn-sm" type="button" onclick="removeCustomerHost('${h.id}')">Delete</button>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+
+          <div class="card anim" style="margin-top:18px;">
+            <div class="card-head">
+              <h2>Interactive VPS &amp; Host Command Console</h2>
+              <div class="btn-group">
+                <button class="btn btn-outline btn-sm" type="button" onclick="clearConsoleLogs()">Clear Console</button>
+                <button class="btn btn-outline btn-sm" type="button" onclick="copyConsoleLogs()">Copy Logs</button>
+                <button class="btn btn-outline btn-sm" type="button" onclick="showCommandHistory()">Command History</button>
+              </div>
+            </div>
+
+            <div class="bridge-strip">
+              <div class="grid-3" style="margin-bottom:8px;">
+                <div class="field" style="margin:0;">
+                  <label for="bridgeUrlInp">VPS Backend URL</label>
+                  <input id="bridgeUrlInp" type="text" value="${escapeHtml(bridgeConfig.url)}" placeholder="http://YOUR_VPS_IP:3001" />
+                </div>
+                <div class="field" style="margin:0;">
+                  <label for="bridgeKeyInp">Panel Key</label>
+                  <input id="bridgeKeyInp" type="text" value="${escapeHtml(bridgeConfig.key)}" />
+                </div>
+                <div class="field" style="margin:0; display:flex; align-items:flex-end;">
+                  <button class="btn btn-outline btn-sm btn-block" type="button" onclick="saveBridgeSettings()">Save Bridge</button>
+                </div>
+              </div>
+              <label style="display:inline-flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:700; cursor:pointer;">
+                <input id="bridgeLiveChk" type="checkbox" ${bridgeConfig.liveExec ? "checked" : ""} onchange="saveBridgeSettings()" style="width:16px; height:16px; accent-color:#10B981;" />
+                Execute commands on live VPS backend (/api/run)
+              </label>
+            </div>
+
+            <div class="console-shell">
+              <div id="consoleOutput" class="console-output">
+                ${vps.logs.map(l => {
+                  const tagCls = l.tag === "SYSTEM" ? "tag-sys" : l.tag === "HOST" ? "tag-host" : l.tag === "ERR" ? "tag-err" : "tag-info";
+                  return `<div class="log-line"><span class="log-ts">[${escapeHtml(l.ts)}]</span><span class="${tagCls}">[${escapeHtml(l.tag)}]</span> ${escapeHtml(l.msg)}</div>`;
+                }).join("")}
+              </div>
+              <form class="console-bar" onsubmit="runConsoleCommand(event)">
+                <span class="console-prompt">root@${escapeHtml(vps.hostname)}:~#</span>
+                <input
+                  id="consoleCmdInput"
+                  class="console-input"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="Type a command (help, status, specs, hosts, restart, clear)..."
+                  onkeydown="handleConsoleKeydown(event)"
+                />
+                <button class="btn btn-emerald btn-sm" type="submit">Run / Send</button>
+              </form>
+            </div>
+          </div>
+        `}
+      `;
+
+      const out = document.getElementById("consoleOutput");
+      if (out) out.scrollTop = out.scrollHeight;
+    }
+
+    function startTelemetryLoop() {
+      if (telemetryTimer) clearInterval(telemetryTimer);
+      telemetryTimer = setInterval(() => {
+        if (!currentSession || currentSession.role !== "customer") return;
+        const vps = getActiveCustomerVps();
+        if (!vps || vps.status !== "online") return;
+
+        const baseCpu = 12 + vps.hosts.filter(h => h.running).length * 11;
+        const jitter = Math.floor(Math.random() * 7) - 3;
+        const nextCpu = Math.max(4, Math.min(95, baseCpu + jitter));
+
+        mutateCustomerVps(vps.id, v => {
+          v.usage.cpuPct = nextCpu;
+        });
+
+        const barFills = document.querySelectorAll(".bar-fill");
+        const cpuSmall = document.querySelector(".metric-box small");
+        if (barFills[0] && cpuSmall) {
+          barFills[0].style.width = nextCpu + "%";
+          cpuSmall.textContent = `vCPU Cores (${nextCpu}% Load)`;
+        }
+      }, 3500);
+    }
+
+    function renderApp() {
+      const authEl = document.getElementById("authSection");
+      const rootEl = document.getElementById("appRoot");
+
+      if (!currentSession) {
+        authEl.style.display = "block";
+        rootEl.style.display = "none";
+        rootEl.innerHTML = "";
+        return;
+      }
+
+      authEl.style.display = "none";
+      rootEl.style.display = "block";
+
+      if (currentSession.role === "admin") {
+        renderAdminDashboard();
+      } else if (currentSession.role === "customer") {
+        renderCustomerDashboard();
+        startTelemetryLoop();
+      } else {
+        handleLogout();
+      }
+    }
+
+    renderApp();
+  </script>
+</body>
+</html>
