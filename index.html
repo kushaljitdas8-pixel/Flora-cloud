@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flora Cloud Panel</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --green: #16a34a;
+      --green-dark: #15803d;
+      --blue: #2563eb;
+      --amber: #d97706;
+      --red: #dc2626;
+      --term-bg: #070b14;
+      --term-ink: #e2e8f0;
+      --term-green: #4ade80;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      padding: 14px;
+      line-height: 1.45;
+    }
+
+    .auth-wrap {
+      max-width: 420px;
+      margin: 36px auto;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 3px 14px rgba(15, 23, 42, 0.04);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 14px 0 6px;
+    }
+
+    .tab-btn {
+      padding: 10px;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      color: var(--muted);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: #dcfce7;
+      color: var(--green-dark);
+      border-color: #86efac;
+    }
+
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .role-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: var(--blue);
+      border: 1px solid #bfdbfe;
+    }
+
+    .role-badge.admin {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fde68a;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .no-vps-box {
+      margin-top: 12px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 16px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin: 10px 0 4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      font-size: 14px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-blue { background: var(--blue); color: #fff; }
+    .btn-amber { background: var(--amber); color: #fff; }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-soft { background: #f1f5f9; color: var(--ink); border: 1px solid var(--line); }
+    .btn-full { width: 100%; margin-top: 12px; padding: 10px; }
+
+    .vps-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: #fafcff;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: var(--green-dark);
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .ctrl-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .bridge-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      align-items: end;
+      margin: 8px 0;
+    }
+
+    .check-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0 10px;
+      font-size: 12.5px;
+    }
+
+    .check-line input {
+      width: auto;
+    }
+
+    .terminal {
+      background: var(--term-bg);
+      color: var(--term-ink);
+      border-radius: 12px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .term-log {
+      height: 210px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .term-cmd {
+      color: var(--term-green);
+      margin-top: 6px;
+    }
+
+    .term-input-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .term-prompt {
+      color: var(--term-green);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .term-input-bar input {
+      background: #111827;
+      color: #fff;
+      border-color: #26355d;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .msg-ok {
+      color: var(--green-dark);
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+      min-height: 16px;
+    }
+
+    .msg-err {
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+      min-height: 16px;
+    }
+  </style>
+</head>
+<body>
+  <!-- AUTHENTICATION -->
+  <div id="authScreen" class="auth-wrap card">
+    <h2>Flora Cloud Panel</h2>
+    <div class="muted">Login or Sign Up to continue</div>
+
+    <div class="tabs">
+      <button id="tabLogin" type="button" class="tab-btn active">Login</button>
+      <button id="tabSignup" type="button" class="tab-btn">Sign Up</button>
+    </div>
+
+    <form id="loginForm">
+      <label for="liEmail">Email</label>
+      <input id="liEmail" type="email" inputmode="email" placeholder="Enter email" required />
+
+      <label for="liPass">Password</label>
+      <input id="liPass" type="password" inputmode="text" placeholder="Enter password" required />
+
+      <div id="liMsg" class="msg-err"></div>
+      <button id="btnLoginSubmit" type="submit" class="btn-green btn-full">Login</button>
+    </form>
+
+    <form id="signupForm" class="hidden">
+      <label for="suUsername">Username</label>
+      <input id="suUsername" type="text" inputmode="text" placeholder="Enter username" required />
+
+      <label for="suEmail">Email</label>
+      <input id="suEmail" type="email" inputmode="email" placeholder="Enter email" required />
+
+      <label for="suPass">Password</label>
+      <input id="suPass" type="password" inputmode="text" placeholder="Create password" required />
+
+      <div id="suMsg" class="msg-ok"></div>
+      <button id="btnSignupSubmit" type="submit" class="btn-green btn-full">Sign Up & Go to Login</button>
+    </form>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="panelScreen" class="wrap hidden">
+    <div class="card">
+      <div class="top-header">
+        <div>
+          <h2 id="panelTitle">Customer Panel</h2>
+          <div class="muted" id="sessionMeta">user@floracloud.host</div>
+        </div>
+        <div class="header-right">
+          <span class="role-badge" id="roleBadge">CUSTOMER ACCOUNT</span>
+          <button id="btnLogout" type="button" class="btn-soft">Log Out</button>
+        </div>
+      </div>
+
+      <!-- Customer VPS View -->
+      <div id="customerVpsSection">
+        <div id="noVpsBox" class="no-vps-box">No VPS found</div>
+        <div id="customerVpsList"></div>
+
+        <!-- Customer VPS Controller (Shown only when VPS is assigned) -->
+        <div id="customerControllerBox" class="hidden">
+          <div class="ctrl-bar">
+            <button type="button" class="btn-green" data-power="Start">Start</button>
+            <button type="button" class="btn-blue" data-power="Restart">Restart</button>
+            <button type="button" class="btn-amber" data-power="Stop">Stop</button>
+            <button type="button" class="btn-soft" data-power="Reinstall OS">Reinstall OS</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Terminal (Shown only when VPS is assigned) -->
+    <div id="customerTerminalCard" class="card hidden">
+      <div class="top-header" style="border-bottom:0; padding-bottom:6px;">
+        <h3>VPS Terminal</h3>
+        <button id="btnClearTerm" type="button" class="btn-soft">Clear</button>
+      </div>
+
+      <div class="bridge-row">
+        <div>
+          <label for="backendUrl">VPS Backend URL</label>
+          <input id="backendUrl" type="text" inputmode="url" value="http://YOUR_VPS_IP:3001" />
+        </div>
+        <div>
+          <label for="panelKey">Panel Key</label>
+          <input id="panelKey" type="text" inputmode="text" value="flora-secret-2026" />
+        </div>
+      </div>
+
+      <div class="check-line">
+        <input id="liveBridgeCheck" type="checkbox" />
+        <label for="liveBridgeCheck" style="margin:0; font-weight:500; color:var(--ink);">
+          Execute commands on live VPS backend (/api/run)
+        </label>
+      </div>
+
+      <div class="terminal">
+        <div id="termLog" class="term-log">Terminal ready. Type a command below.</div>
+        <div class="term-input-bar">
+          <span id="termPrompt" class="term-prompt">root@flora:~#</span>
+          <input id="termInput" type="text" inputmode="text" placeholder="Enter command..." />
+          <button id="btnRunCmd" type="button" class="btn-green">Run</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin VPS Configurator (Customer Email at Top) -->
+    <div id="adminConfigCard" class="card hidden">
+      <h3>VPS Configuration</h3>
+      <div class="muted">Enter Customer Email first, then set VPS resources</div>
+
+      <form id="adminConfigForm">
+        <label for="cfgEmail">Customer Email</label>
+        <input id="cfgEmail" type="email" inputmode="email" placeholder="customer@example.com" required />
+
+        <label for="cfgCores">CPU Cores</label>
+        <input id="cfgCores" type="number" inputmode="numeric" min="1" max="128" value="4" required />
+
+        <label for="cfgRam">RAM (GB)</label>
+        <input id="cfgRam" type="number" inputmode="numeric" min="1" max="512" value="8" required />
+
+        <label for="cfgStorage">Storage (GB NVMe)</label>
+        <input id="cfgStorage" type="number" inputmode="numeric" min="10" max="4000" value="80" required />
+
+        <label for="cfgOs">Operating System</label>
+        <input id="cfgOs" type="text" inputmode="text" value="Ubuntu 24.04 LTS" required />
+
+        <label for="cfgIp">Server IP</label>
+        <input id="cfgIp" type="text" inputmode="text" value="198.51.100.24" required />
+
+        <label for="cfgPort">Server Port</label>
+        <input id="cfgPort" type="number" inputmode="numeric" min="1" max="65535" value="25565" required />
+
+        <div id="cfgMsg" class="msg-ok"></div>
+        <button type="submit" class="btn-green btn-full">Send VPS to Email</button>
+      </form>
+    </div>
+
+    <!-- Admin Sent VPS Status & Permanent Delete -->
+    <div id="adminSentCard" class="card hidden">
+      <h3>Sent VPS Status</h3>
+      <div class="muted">Shows whether VPS was sent and which email received it</div>
+      <div id="adminVpsList"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const ADMIN_EMAIL = "admin@floracloud.host";
+      const ADMIN_PASS = "flora@admin2026";
+      const USERS_KEY = "flora_users_v4";
+      const VPS_KEY = "flora_vps_list_v4";
+
+      const fallbackStore = { users: [], vpsList: [] };
+
+      function loadData(key, fallbackArr) {
+        try {
+          const raw = window.localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) return parsed;
+          }
+        } catch (_) {}
+        return fallbackArr;
+      }
+
+      function saveData(key, arr, fallbackRef) {
+        fallbackStore[fallbackRef] = arr;
+        try {
+          window.localStorage.setItem(key, JSON.stringify(arr));
+        } catch (_) {}
+      }
+
+      let currentSession = null;
+
+      const tabLogin = document.getElementById("tabLogin");
+      const tabSignup = document.getElementById("tabSignup");
+      const loginForm = document.getElementById("loginForm");
+      const signupForm = document.getElementById("signupForm");
+      const liEmail = document.getElementById("liEmail");
+      const liPass = document.getElementById("liPass");
+      const liMsg = document.getElementById("liMsg");
+      const suUsername = document.getElementById("suUsername");
+      const suEmail = document.getElementById("suEmail");
+      const suPass = document.getElementById("suPass");
+      const suMsg = document.getElementById("suMsg");
+      const authScreen = document.getElementById("authScreen");
+      const panelScreen = document.getElementById("panelScreen");
+      const panelTitle = document.getElementById("panelTitle");
+      const sessionMeta = document.getElementById("sessionMeta");
+      const roleBadge = document.getElementById("roleBadge");
+      const customerVpsSection = document.getElementById("customerVpsSection");
+      const noVpsBox = document.getElementById("noVpsBox");
+      const customerVpsList = document.getElementById("customerVpsList");
+      const customerControllerBox = document.getElementById("customerControllerBox");
+      const customerTerminalCard = document.getElementById("customerTerminalCard");
+      const adminConfigCard = document.getElementById("adminConfigCard");
+      const adminSentCard = document.getElementById("adminSentCard");
+      const adminVpsList = document.getElementById("adminVpsList");
+      const adminConfigForm = document.getElementById("adminConfigForm");
+      const cfgMsg = document.getElementById("cfgMsg");
+      const termLog = document.getElementById("termLog");
+      const termPrompt = document.getElementById("termPrompt");
+      const termInput = document.getElementById("termInput");
+
+      function switchTab(mode) {
+        const isLogin = mode === "login";
+        tabLogin.classList.toggle("active", isLogin);
+        tabSignup.classList.toggle("active", !isLogin);
+        loginForm.classList.toggle("hidden", !isLogin);
+        signupForm.classList.toggle("hidden", isLogin);
+        liMsg.textContent = "";
+        suMsg.textContent = "";
+      }
+
+      tabLogin.addEventListener("click", function () {
+        switchTab("login");
+      });
+
+      tabSignup.addEventListener("click", function () {
+        switchTab("signup");
+      });
+
+      signupForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const username = suUsername.value.trim();
+        const email = suEmail.value.trim().toLowerCase();
+        const password = suPass.value;
+
+        if (!username || !email || !password) {
+          suMsg.className = "msg-err";
+          suMsg.textContent = "Fill Username, Email, and Password.";
+          return;
+        }
+
+        const users = loadData(USERS_KEY, fallbackStore.users);
+        const idx = users.findIndex(function (u) {
+          return u.email === email;
+        });
+        const record = { username: username, email: email, password: password };
+        if (idx >= 0) users[idx] = record;
+        else users.push(record);
+        saveData(USERS_KEY, users, "users");
+
+        suUsername.value = "";
+        suEmail.value = "";
+        suPass.value = "";
+        suMsg.textContent = "";
+
+        switchTab("login");
+        liEmail.value = email;
+        liPass.value = password;
+        liMsg.className = "msg-ok";
+        liMsg.textContent = "Saved! Click Login now.";
+      });
+
+      loginForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const email = liEmail.value.trim().toLowerCase();
+        const password = liPass.value;
+
+        if (email === ADMIN_EMAIL && password === ADMIN_PASS) {
+          currentSession = {
+            role: "admin",
+            title: "Admin Panel",
+            meta: "Admin (" + ADMIN_EMAIL + ")",
+            badgeText: "ADMIN ACCOUNT"
+          };
+          openPanel();
+          return;
+        }
+
+        const users = loadData(USERS_KEY, fallbackStore.users);
+        const found = users.find(function (u) {
+          return u.email === email && u.password === password;
+        });
+
+        if (!found) {
+          liMsg.className = "msg-err";
+          liMsg.textContent = "Sign Up first or enter valid Email and Password.";
+          return;
+        }
+
+        currentSession = {
+          role: "customer",
+          email: found.email,
+          title: "Customer Panel",
+          meta: found.username + " (" + found.email + ")",
+          badgeText: "CUSTOMER ACCOUNT"
+        };
+        openPanel();
+      });
+
+      function appendTerm(text, isCmd) {
+        const line = document.createElement("div");
+        if (isCmd) {
+          line.className = "term-cmd";
+          line.textContent = termPrompt.textContent + " " + text;
+        } else {
+          line.textContent = text;
+        }
+        termLog.appendChild(line);
+        termLog.scrollTop = termLog.scrollHeight;
+      }
+
+      function renderCustomerVps() {
+        const allVps = loadData(VPS_KEY, fallbackStore.vpsList);
+        const myVps = allVps.filter(function (v) {
+          return v.email === currentSession.email && v.sent === true;
+        });
+
+        customerVpsList.innerHTML = "";
+        if (!myVps.length) {
+          noVpsBox.classList.remove("hidden");
+          customerControllerBox.classList.add("hidden");
+          customerTerminalCard.classList.add("hidden");
+          return;
+        }
+
+        noVpsBox.classList.add("hidden");
+        customerControllerBox.classList.remove("hidden");
+        customerTerminalCard.classList.remove("hidden");
+
+        const latest = myVps[myVps.length - 1];
+        termPrompt.textContent = "root@" + latest.ip + ":~#";
+
+        myVps.forEach(function (v) {
+          const item = document.createElement("div");
+          item.className = "vps-item";
+          item.innerHTML =
+            "<div>" +
+            "<span class='status-tag'>VPS Sent: Yes</span>" +
+            "<div><strong>Assigned Email:</strong> " + v.email + "</div>" +
+            "<div class='muted'><strong>CPU Cores:</strong> " + v.cores + " Cores • <strong>RAM:</strong> " + v.ram + " GB • <strong>Storage:</strong> " + v.storage + " GB NVMe</div>" +
+            "<div class='muted'><strong>OS:</strong> " + v.os + " • <strong>IP & Port:</strong> " + v.ip + ":" + v.port + "</div>" +
+            "</div>";
+          customerVpsList.appendChild(item);
+        });
+      }
+
+      document.querySelectorAll("[data-power]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const action = btn.getAttribute("data-power");
+          appendTerm("[VPS CONTROL] " + action + " -> OK");
+        });
+      });
+
+      document.getElementById("btnClearTerm").addEventListener("click", function () {
+        termLog.innerHTML = "";
+      });
+
+      async function runTermCmd() {
+        const cmd = termInput.value.trim();
+        if (!cmd) return;
+        termInput.value = "";
+        appendTerm(cmd, true);
+
+        if (cmd === "clear") {
+          termLog.innerHTML = "";
+          return;
+        }
+
+        const useLive = document.getElementById("liveBridgeCheck").checked;
+        const url = document.getElementById("backendUrl").value.trim();
+        const key = document.getElementById("panelKey").value.trim();
+
+        if (useLive) {
+          try {
+            const resp = await fetch(url.replace(/\/$/, "") + "/api/run", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ key: key, command: cmd })
+            });
+            const data = await resp.json();
+            appendTerm(data.output || JSON.stringify(data));
+          } catch (err) {
+            appendTerm("[ERROR] Backend unreachable (" + url + "): " + err.message);
+          }
+          return;
+        }
+
+        appendTerm("Executed: " + cmd);
+      }
+
+      document.getElementById("btnRunCmd").addEventListener("click", runTermCmd);
+      termInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          runTermCmd();
+        }
+      });
+
+      function renderAdminVps() {
+        const allVps = loadData(VPS_KEY, fallbackStore.vpsList);
+        adminVpsList.innerHTML = "";
+
+        if (!allVps.length) {
+          adminVpsList.innerHTML = "<div class='no-vps-box'>No VPS sent yet</div>";
+          return;
+        }
+
+        allVps.forEach(function (v) {
+          const item = document.createElement("div");
+          item.className = "vps-item";
+          item.innerHTML =
+            "<div>" +
+            "<span class='status-tag'>VPS Sent: " + (v.sent ? "Yes" : "No") + "</span>" +
+            "<div><strong>Customer Email:</strong> " + v.email + "</div>" +
+            "<div class='muted'><strong>CPU Cores:</strong> " + v.cores + " Cores • <strong>RAM:</strong> " + v.ram + " GB • <strong>Storage:</strong> " + v.storage + " GB NVMe</div>" +
+            "<div class='muted'><strong>OS:</strong> " + v.os + " • <strong>IP & Port:</strong> " + v.ip + ":" + v.port + "</div>" +
+            "</div>" +
+            "<button type='button' class='btn-red' data-del-id='" + v.id + "'>Delete</button>";
+
+          item.querySelector("[data-del-id]").addEventListener("click", function () {
+            deleteVpsPermanent(v.id);
+          });
+          adminVpsList.appendChild(item);
+        });
+      }
+
+      function deleteVpsPermanent(id) {
+        const allVps = loadData(VPS_KEY, fallbackStore.vpsList);
+        const filtered = allVps.filter(function (v) {
+          return v.id !== id;
+        });
+        saveData(VPS_KEY, filtered, "vpsList");
+        renderAdminVps();
+      }
+
+      adminConfigForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const email = document.getElementById("cfgEmail").value.trim().toLowerCase();
+        const cores = Number(document.getElementById("cfgCores").value) || 4;
+        const ram = Number(document.getElementById("cfgRam").value) || 8;
+        const storage = Number(document.getElementById("cfgStorage").value) || 80;
+        const os = document.getElementById("cfgOs").value.trim() || "Ubuntu 24.04 LTS";
+        const ip = document.getElementById("cfgIp").value.trim() || "198.51.100.24";
+        const port = Number(document.getElementById("cfgPort").value) || 25565;
+
+        if (!email) return;
+
+        const allVps = loadData(VPS_KEY, fallbackStore.vpsList);
+        allVps.push({
+          id: "vps_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+          sent: true,
+          email: email,
+          cores: cores,
+          ram: ram,
+          storage: storage,
+          os: os,
+          ip: ip,
+          port: port
+        });
+        saveData(VPS_KEY, allVps, "vpsList");
+
+        cfgMsg.textContent = "VPS Sent: Yes -> Sent to " + email;
+        renderAdminVps();
+      });
+
+      function openPanel() {
+        const isAdmin = currentSession.role === "admin";
+        panelTitle.textContent = currentSession.title;
+        sessionMeta.textContent = currentSession.meta;
+        roleBadge.textContent = currentSession.badgeText;
+        roleBadge.className = isAdmin ? "role-badge admin" : "role-badge";
+
+        customerVpsSection.classList.toggle("hidden", isAdmin);
+        adminConfigCard.classList.toggle("hidden", !isAdmin);
+        adminSentCard.classList.toggle("hidden", !isAdmin);
+
+        if (isAdmin) {
+          customerTerminalCard.classList.add("hidden");
+          renderAdminVps();
+        } else {
+          renderCustomerVps();
+        }
+
+        authScreen.classList.add("hidden");
+        panelScreen.classList.remove("hidden");
+      }
+
+      document.getElementById("btnLogout").addEventListener("click", function () {
+        currentSession = null;
+        panelScreen.classList.add("hidden");
+        authScreen.classList.remove("hidden");
+        switchTab("login");
+      });
+    })();
+  </script>
+</body>
+</html>
