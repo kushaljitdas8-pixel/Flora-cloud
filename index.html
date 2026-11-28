@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flora Cloud Panel</title>
+  <style>
+    :root {
+      --card-bg: rgba(255, 255, 255, 0.96);
+      --border-soft: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --mc-green: #16a34a;
+      --mc-green-dark: #15803d;
+      --mc-green-shadow: #14532d;
+      --mc-blue: #2563eb;
+      --mc-amber: #d97706;
+      --mc-red: #dc2626;
+      --mc-red-dark: #b91c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px 14px 36px;
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      background-color: #dcfce7;
+      background-image:
+        linear-gradient(180deg, rgba(186, 230, 253, 0.55) 0%, rgba(220, 252, 231, 0.72) 38%, rgba(217, 249, 157, 0.65) 100%),
+        repeating-linear-gradient(0deg, rgba(22, 163, 74, 0.08) 0px, rgba(22, 163, 74, 0.08) 2px, transparent 2px, transparent 24px),
+        repeating-linear-gradient(90deg, rgba(22, 163, 74, 0.08) 0px, rgba(22, 163, 74, 0.08) 2px, transparent 2px, transparent 24px);
+      background-attachment: fixed;
+    }
+
+    .mc-top-strip {
+      max-width: 880px;
+      margin: 0 auto 14px;
+      height: 12px;
+      border-radius: 6px;
+      border: 2px solid #14532d;
+      background: repeating-linear-gradient(90deg, #22c55e 0px, #22c55e 16px, #16a34a 16px, #16a34a 32px, #15803d 32px, #15803d 48px);
+      box-shadow: 0 3px 0 #14532d;
+    }
+
+    .flora-logo-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 12px 6px 8px;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      box-shadow: 0 2px 0 #cbd5e1;
+      margin-bottom: 10px;
+    }
+
+    .flora-logo-cube {
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 55%, #15803d 100%);
+      border: 2px solid #14532d;
+      box-shadow: 0 2px 0 #14532d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .flora-logo-label {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .flora-logo-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: 0.02em;
+    }
+
+    .flora-logo-tag {
+      font-size: 10px;
+      font-weight: 700;
+      color: #16a34a;
+      letter-spacing: 0.04em;
+    }
+
+    .auth-wrap {
+      max-width: 430px;
+      margin: 14px auto;
+      background: var(--card-bg);
+      border: 2px solid var(--border-soft);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 6px 0 rgba(15, 23, 42, 0.07), 0 14px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    .auth-title {
+      margin: 0 0 4px 0;
+      font-size: 21px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .auth-sub {
+      margin: 0 0 16px 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+      background: #f8fafc;
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .mode-btn {
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mode-btn.active {
+      background: #dcfce7;
+      border-color: #86efac;
+      color: #166534;
+      box-shadow: 0 2px 0 #86efac;
+    }
+
+    .panel-wrap {
+      max-width: 880px;
+      margin: 0 auto;
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-wrap.active {
+      display: flex;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 4px 0 rgba(15, 23, 42, 0.06), 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel-heading {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .panel-email {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .right-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .top-actions-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge-admin {
+      background: #fef9c3;
+      color: #854d0e;
+      border: 1px solid #fde047;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 7px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 0 #eab308;
+    }
+
+    .badge-customer {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #93c5fd;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 7px;
+      text-transform: uppercase;
+    }
+
+    .badge-running {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .badge-region {
+      display: inline-block;
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-left: 6px;
+    }
+
+    .btn-logout,
+    .btn-emails-below {
+      background: #ffffff;
+      color: var(--text-main);
+      border: 1px solid #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 0 #cbd5e1;
+    }
+
+    .section-title {
+      margin: 0 0 2px 0;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .section-sub {
+      margin: 0 0 12px 0;
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .preset-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .preset-chip {
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      background: #ffffff;
+      color: var(--text-main);
+      font-size: 13.5px;
+      outline: none;
+    }
+
+    .btn-green-full {
+      width: 100%;
+      padding: 11px 14px;
+      border: none;
+      border-radius: 9px;
+      background: var(--mc-green);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--mc-green-shadow);
+    }
+
+    .msg-line {
+      margin-top: 8px;
+      font-size: 12.5px;
+      color: #0f766e;
+      min-height: 16px;
+      font-weight: 600;
+    }
+
+    .msg-error {
+      color: #dc2626;
+    }
+
+    .filter-input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      background: #f8fafc;
+      color: var(--text-main);
+      font-size: 13px;
+      margin-bottom: 8px;
+      outline: none;
+    }
+
+    .sent-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid #cbd5e1;
+      border-left: 5px solid var(--mc-green);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #f8fafc;
+      margin-top: 10px;
+    }
+
+    .sent-email {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+      word-break: break-all;
+    }
+
+    .sent-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .btn-copy-vps {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-delete {
+      background: var(--mc-red);
+      color: #ffffff;
+      border: none;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .vps-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+      font-size: 13.5px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-sm-green { background: var(--mc-green); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .btn-sm-blue { background: var(--mc-blue); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .btn-sm-amber { background: var(--mc-amber); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .btn-sm-outline { background: #fff; color: var(--text-main); border: 1px solid #cbd5e1; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.48);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .modal-bg.open {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 460px;
+      max-height: 75vh;
+      overflow-y: auto;
+      background: var(--card-bg);
+      border: 2px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .email-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 4px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 13px;
+    }
+
+    .btn-use {
+      background: var(--mc-green);
+      color: #ffffff;
+      border: none;
+      padding: 6px 11px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mc-top-strip" aria-hidden="true"></div>
+
+  <!-- 1. AUTH SCREEN -->
+  <div class="auth-wrap" id="auth-screen">
+    <div class="flora-logo-mark">
+      <div class="flora-logo-cube">F</div>
+      <div class="flora-logo-label">
+        <span class="flora-logo-name">FLORA CLOUD</span>
+        <span class="flora-logo-tag">SELF-HOSTED VPS</span>
+      </div>
+    </div>
+
+    <h1 class="auth-title">Flora Cloud Panel</h1>
+    <p class="auth-sub" id="auth-subtitle">Login with your email and password</p>
+
+    <div class="mode-switch">
+      <button type="button" class="mode-btn active" id="tab-login">Login</button>
+      <button type="button" class="mode-btn" id="tab-signup">Sign In</button>
+    </div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="Enter email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" placeholder="Enter password" required />
+      </div>
+
+      <button type="submit" class="btn-green-full">Login</button>
+      <div class="msg-line" id="login-msg"></div>
+    </form>
+
+    <form id="signup-form" style="display:none;">
+      <div class="form-group">
+        <label for="signup-username">Username</label>
+        <input type="text" id="signup-username" placeholder="Enter username" required />
+      </div>
+
+      <div class="form-group">
+        <label for="signup-email">Email</label>
+        <input type="email" id="signup-email" placeholder="Enter email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="signup-password">Password</label>
+        <input type="password" id="signup-password" placeholder="Enter password" required />
+      </div>
+
+      <button type="submit" class="btn-green-full">Sign In</button>
+      <div class="msg-line" id="signup-msg"></div>
+    </form>
+  </div>
+
+  <!-- 2. ADMIN PANEL SCREEN -->
+  <div class="panel-wrap" id="admin-screen">
+    <div class="card">
+      <div class="top-bar">
+        <div>
+          <div class="flora-logo-mark">
+            <div class="flora-logo-cube">F</div>
+            <div class="flora-logo-label">
+              <span class="flora-logo-name">FLORA CLOUD</span>
+              <span class="flora-logo-tag">SELF-HOSTED VPS</span>
+            </div>
+          </div>
+          <h2 class="panel-heading">Admin Panel</h2>
+          <div class="panel-email" id="admin-display-email">Admin</div>
+        </div>
+
+        <div class="right-controls">
+          <div class="top-actions-row">
+            <span class="badge-admin">ADMIN ACCOUNT</span>
+            <button type="button" class="btn-logout" id="btn-admin-logout">Log Out</button>
+          </div>
+          <button type="button" class="btn-emails-below" id="btn-open-emails">Signed-In Emails</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Node Connection &amp; VPS Configuration</h3>
+      <p class="section-sub">Connect to your own server.js node to provision real Docker VPS containers</p>
+
+      <div class="form-group">
+        <label for="cfg-backend-url">Self-Hosted Server URL (leave blank if opened directly from server.js)</label>
+        <input type="text" id="cfg-backend-url" placeholder="e.g. http://YOUR_SERVER_IP:3001" />
+      </div>
+
+      <div class="preset-bar">
+        <button type="button" class="preset-chip" data-preset="stone">Stone (2C · 4GB · 40GB)</button>
+        <button type="button" class="preset-chip" data-preset="iron">Iron (4C · 8GB · 80GB)</button>
+        <button type="button" class="preset-chip" data-preset="diamond">Diamond (6C · 16GB · 160GB)</button>
+        <button type="button" class="preset-chip" data-preset="netherite">Netherite (8C · 32GB · 240GB)</button>
+      </div>
+
+      <form id="vps-config-form">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="cfg-customer-email">Customer Email</label>
+            <input type="email" id="cfg-customer-email" placeholder="customer@example.com" required />
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-country-ping">Country &amp; Est. Ping</label>
+            <select id="cfg-country-ping">
+              <option value="India (Mumbai) · ~25-45 ms">India (Mumbai) · ~25-45 ms</option>
+              <option value="Singapore · ~45-75 ms">Singapore · ~45-75 ms</option>
+              <option value="Germany (Frankfurt) · ~130-165 ms">Germany (Frankfurt) · ~130-165 ms</option>
+              <option value="Netherlands (Amsterdam) · ~135-170 ms">Netherlands (Amsterdam) · ~135-170 ms</option>
+              <option value="United States (Virginia) · ~185-230 ms">United States (Virginia) · ~185-230 ms</option>
+              <option value="Japan (Tokyo) · ~75-110 ms">Japan (Tokyo) · ~75-110 ms</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="cfg-cpu">CPU Cores</label>
+            <input type="text" id="cfg-cpu" value="2" required />
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-ram">RAM (GB)</label>
+            <input type="text" id="cfg-ram" value="4" required />
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="cfg-storage">Storage (GB NVMe)</label>
+            <input type="text" id="cfg-storage" value="40" required />
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-os">Operating System</label>
+            <input type="text" id="cfg-os" value="Ubuntu 24.04 LTS" required />
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="cfg-ip">Server IP</label>
+            <input type="text" id="cfg-ip" value="198.51.100.24" required />
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-port">Server Port</label>
+            <input type="text" id="cfg-port" value="25565" required />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-green-full">Create &amp; Send VPS to Email</button>
+        <div class="msg-line" id="cfg-msg"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Sent VPS Status</h3>
+      <p class="section-sub">Shows provisioned VPS containers, country/ping, and assigned customer emails</p>
+      <input type="text" class="filter-input" id="sent-filter-input" placeholder="Search by email, country, or IP..." />
+      <div id="sent-vps-container"></div>
+    </div>
+  </div>
+
+  <!-- 3. CUSTOMER PANEL SCREEN -->
+  <div class="panel-wrap" id="customer-screen">
+    <div class="card">
+      <div class="top-bar">
+        <div>
+          <div class="flora-logo-mark">
+            <div class="flora-logo-cube">F</div>
+            <div class="flora-logo-label">
+              <span class="flora-logo-name">FLORA CLOUD</span>
+              <span class="flora-logo-tag">SELF-HOSTED VPS</span>
+            </div>
+          </div>
+          <h2 class="panel-heading">Customer Panel</h2>
+          <div class="panel-email" id="customer-display-user">User</div>
+        </div>
+        <div class="top-actions-row">
+          <span class="badge-customer">CUSTOMER ACCOUNT</span>
+          <button type="button" class="btn-logout" id="btn-customer-logout">Log Out</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Your VPS</h3>
+      <p class="section-sub">Real container status, country/ping, and connection details</p>
+
+      <div class="vps-box">
+        <span class="badge-running" id="customer-vps-badge">VPS Status: Running</span>
+        <div id="customer-vps-details">Loading VPS details...</div>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn-sm-green" data-cust-power="Start">Start</button>
+        <button type="button" class="btn-sm-blue" data-cust-power="Restart">Restart</button>
+        <button type="button" class="btn-sm-amber" data-cust-power="Stop">Stop</button>
+      </div>
+      <div class="msg-line" id="customer-action-msg"></div>
+    </div>
+  </div>
+
+  <!-- SIGNED-IN EMAILS POPUP LIST -->
+  <div class="modal-bg" id="emails-modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <strong style="font-size:15px;">Signed-In Emails</strong>
+        <button type="button" class="btn-logout" id="btn-close-emails">Close</button>
+      </div>
+      <div id="emails-modal-list"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const ADMIN_EMAIL = "admin@floracloud.host";
+      const ADMIN_PASS = "admin123";
+
+      const PRESETS = {
+        stone: { cpu: "2", ram: "4", storage: "40", os: "Ubuntu 24.04 LTS" },
+        iron: { cpu: "4", ram: "8", storage: "80", os: "Ubuntu 24.04 LTS" },
+        diamond: { cpu: "6", ram: "16", storage: "160", os: "Debian 12" },
+        netherite: { cpu: "8", ram: "32", storage: "240", os: "Ubuntu 24.04 LTS" }
+      };
+
+      const KEYS = {
+        backendUrl: "flora_self_backend_url",
+        signedUsers: "flora_panel_signed_users",
+        accountHashes: "flora_panel_account_hashes",
+        sentVps: "flora_panel_sent_vps_list"
+      };
+
+      const authScreen = document.getElementById("auth-screen");
+      const adminScreen = document.getElementById("admin-screen");
+      const customerScreen = document.getElementById("customer-screen");
+      const authSubtitle = document.getElementById("auth-subtitle");
+
+      const tabLogin = document.getElementById("tab-login");
+      const tabSignup = document.getElementById("tab-signup");
+
+      const loginForm = document.getElementById("login-form");
+      const loginEmail = document.getElementById("login-email");
+      const loginPassword = document.getElementById("login-password");
+      const loginMsg = document.getElementById("login-msg");
+
+      const signupForm = document.getElementById("signup-form");
+      const signupUsername = document.getElementById("signup-username");
+      const signupEmail = document.getElementById("signup-email");
+      const signupPassword = document.getElementById("signup-password");
+      const signupMsg = document.getElementById("signup-msg");
+
+      const adminDisplayEmail = document.getElementById("admin-display-email");
+      const adminLogoutBtn = document.getElementById("btn-admin-logout");
+      const openEmailsBtn = document.getElementById("btn-open-emails");
+      const emailsModal = document.getElementById("emails-modal");
+      const closeEmailsBtn = document.getElementById("btn-close-emails");
+      const emailsModalList = document.getElementById("emails-modal-list");
+
+      const cfgBackendUrl = document.getElementById("cfg-backend-url");
+      const vpsForm = document.getElementById("vps-config-form");
+      const cfgEmail = document.getElementById("cfg-customer-email");
+      const cfgCountryPing = document.getElementById("cfg-country-ping");
+      const cfgCpu = document.getElementById("cfg-cpu");
+      const cfgRam = document.getElementById("cfg-ram");
+      const cfgStorage = document.getElementById("cfg-storage");
+      const cfgOs = document.getElementById("cfg-os");
+      const cfgIp = document.getElementById("cfg-ip");
+      const cfgPort = document.getElementById("cfg-port");
+      const cfgMsg = document.getElementById("cfg-msg");
+      const sentFilterInput = document.getElementById("sent-filter-input");
+      const sentContainer = document.getElementById("sent-vps-container");
+
+      const customerDisplayUser = document.getElementById("customer-display-user");
+      const customerLogoutBtn = document.getElementById("btn-customer-logout");
+      const customerVpsBadge = document.getElementById("customer-vps-badge");
+      const customerVpsDetails = document.getElementById("customer-vps-details");
+      const customerActionMsg = document.getElementById("customer-action-msg");
+
+      let activeCustomerVpsId = null;
+
+      function getApiBase() {
+        const custom = (cfgBackendUrl && cfgBackendUrl.value ? cfgBackendUrl.value : localStorage.getItem(KEYS.backendUrl) || "").trim().replace(/\/+$/, "");
+        if (custom) return custom;
+        if (window.location.protocol.startsWith("http")) return window.location.origin;
+        return "";
+      }
+
+      if (cfgBackendUrl) {
+        cfgBackendUrl.value = localStorage.getItem(KEYS.backendUrl) || "";
+        cfgBackendUrl.addEventListener("change", () => {
+          localStorage.setItem(KEYS.backendUrl, cfgBackendUrl.value.trim());
+        });
+      }
+
+      async function apiCall(endpoint, method, payload) {
+        const base = getApiBase();
+        if (!base) return null;
+        try {
+          const res = await fetch(base + endpoint, {
+            method: method || "GET",
+            headers: { "Content-Type": "application/json" },
+            body: payload ? JSON.stringify(payload) : undefined
+          });
+          return await res.json();
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function readJson(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (_) {
+          return fallback;
+        }
+      }
+
+      function writeJson(key, val) {
+        try {
+          localStorage.setItem(key, JSON.stringify(val));
+        } catch (_) {}
+      }
+
+      function recordLocalUser(email, username) {
+        const list = readJson(KEYS.signedUsers, []);
+        const idx = list.findIndex((u) => u.email === email);
+        if (idx >= 0) list[idx].username = username;
+        else list.unshift({ email, username });
+        writeJson(KEYS.signedUsers, list);
+      }
+
+      function showAuthView() {
+        adminScreen.classList.remove("active");
+        customerScreen.classList.remove("active");
+        authScreen.style.display = "block";
+        loginEmail.value = "";
+        loginPassword.value = "";
+        signupUsername.value = "";
+        signupEmail.value = "";
+        signupPassword.value = "";
+        loginMsg.textContent = "";
+        signupMsg.textContent = "";
+      }
+
+      function showAdminView(email, username) {
+        authScreen.style.display = "none";
+        customerScreen.classList.remove("active");
+        adminScreen.classList.add("active");
+        adminDisplayEmail.textContent = `${username || "Admin"} (${email})`;
+        renderSentVps();
+      }
+
+      async function showCustomerView(email, username) {
+        authScreen.style.display = "none";
+        adminScreen.classList.remove("active");
+        customerScreen.classList.add("active");
+        customerDisplayUser.textContent = `${username || ""} (${email})`;
+        customerActionMsg.textContent = "";
+
+        const remote = await apiCall("/api/vps", "GET");
+        const list = remote && remote.ok ? remote.list : readJson(KEYS.sentVps, []);
+        const match = Array.isArray(list) ? list.find((x) => (x.email || "").toLowerCase() === email) : null;
+
+        if (match) {
+          activeCustomerVpsId = match.id;
+          customerVpsBadge.textContent = "VPS Status: " + (match.status || "Running");
+          customerVpsDetails.innerHTML =
+            `<div><strong>Assigned Email:</strong> ${match.email} <span class="badge-region">${match.region || "India (Mumbai) · ~25-45 ms"}</span></div>` +
+            `<div>CPU Cores: ${match.cpu} Cores · RAM: ${match.ram} GB · Storage: ${match.storage} GB NVMe</div>` +
+            `<div>OS: ${match.os} · IP &amp; Port: ${match.ip}:${match.port}</div>` +
+            `<div class="sent-meta">Container: ${match.containerName || "Standard Node"}</div>`;
+        } else {
+          activeCustomerVpsId = null;
+          customerVpsBadge.textContent = "VPS Status: Pending";
+          customerVpsDetails.innerHTML =
+            `<div><strong>Signed-In Email:</strong> ${email}</div>` +
+            `<div class="panel-email">No VPS assigned to this email yet.</div>`;
+        }
+      }
+
+      document.querySelectorAll("[data-preset]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const p = PRESETS[btn.getAttribute("data-preset")];
+          if (!p) return;
+          cfgCpu.value = p.cpu;
+          cfgRam.value = p.ram;
+          cfgStorage.value = p.storage;
+          cfgOs.value = p.os;
+          cfgMsg.textContent = `Applied preset: ${p.cpu} Cores · ${p.ram} GB RAM · ${p.storage} GB NVMe`;
+        });
+      });
+
+      tabLogin.addEventListener("click", () => {
+        tabLogin.classList.add("active");
+        tabSignup.classList.remove("active");
+        loginForm.style.display = "block";
+        signupForm.style.display = "none";
+        authSubtitle.textContent = "Login with your email and password";
+      });
+
+      tabSignup.addEventListener("click", () => {
+        tabSignup.classList.add("active");
+        tabLogin.classList.remove("active");
+        signupForm.style.display = "block";
+        loginForm.style.display = "none";
+        authSubtitle.textContent = "Sign In with username, email and password";
+      });
+
+      signupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = signupUsername.value.trim();
+        const email = signupEmail.value.trim().toLowerCase();
+        const password = signupPassword.value;
+        if (!username || !email || !password) return;
+
+        const remote = await apiCall("/api/signup", "POST", { username, email, password });
+        recordLocalUser(email, username);
+        const accounts = readJson(KEYS.accountHashes, {});
+        accounts[email] = btoa(email + "::" + password);
+        writeJson(KEYS.accountHashes, accounts);
+
+        const role = remote && remote.ok ? remote.role : (email === ADMIN_EMAIL && password === ADMIN_PASS ? "admin" : "customer");
+        if (role === "admin") showAdminView(email, username);
+        else showCustomerView(email, username);
+      });
+
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = loginEmail.value.trim().toLowerCase();
+        const password = loginPassword.value;
+        if (!email || !password) return;
+
+        const remote = await apiCall("/api/login", "POST", { email, password });
+        if (remote && remote.ok === false) {
+          loginMsg.className = "msg-line msg-error";
+          loginMsg.textContent = remote.error || "Login failed";
+          return;
+        }
+
+        const localUsers = readJson(KEYS.signedUsers, []);
+        const found = localUsers.find((u) => u.email === email);
+        const username = (remote && remote.username) || (found ? found.username : email.split("@")[0]);
+
+        if (!remote) {
+          const accounts = readJson(KEYS.accountHashes, {});
+          const expected = btoa(email + "::" + password);
+          if (email !== ADMIN_EMAIL && accounts[email] && accounts[email] !== expected) {
+            loginMsg.className = "msg-line msg-error";
+            loginMsg.textContent = "Incorrect password for " + email;
+            return;
+          }
+          if (!accounts[email]) {
+            accounts[email] = expected;
+            writeJson(KEYS.accountHashes, accounts);
+          }
+        }
+
+        recordLocalUser(email, username);
+        const role = (remote && remote.role) || (email === ADMIN_EMAIL && password === ADMIN_PASS ? "admin" : "customer");
+        if (role === "admin") showAdminView(email, username);
+        else showCustomerView(email, username);
+      });
+
+      adminLogoutBtn.addEventListener("click", showAuthView);
+      customerLogoutBtn.addEventListener("click", showAuthView);
+
+      document.querySelectorAll("[data-cust-power]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const action = btn.getAttribute("data-cust-power");
+          if (activeCustomerVpsId) {
+            await apiCall("/api/vps/power", "POST", { id: activeCustomerVpsId, action });
+          }
+          customerVpsBadge.textContent = action === "Stop" ? "VPS Status: Stopped" : "VPS Status: Running";
+          customerActionMsg.textContent = `${action} command sent to container.`;
+        });
+      });
+
+      async function renderSentVps() {
+        const query = (sentFilterInput ? sentFilterInput.value : "").trim().toLowerCase();
+        const remote = await apiCall("/api/vps", "GET");
+        const arr = remote && remote.ok ? remote.list : readJson(KEYS.sentVps, []);
+
+        const filtered = query
+          ? arr.filter((item) =>
+              String(item.email || "").toLowerCase().includes(query) ||
+              String(item.region || "").toLowerCase().includes(query) ||
+              String(item.ip || "").toLowerCase().includes(query)
+            )
+          : arr;
+
+        if (!filtered.length) {
+          sentContainer.innerHTML = '<div class="panel-email">No VPS records found.</div>';
+          return;
+        }
+
+        sentContainer.innerHTML = filtered
+          .map(
+            (item) => `
+              <div class="sent-card">
+                <div>
+                  <span class="badge-running">${item.realDockerCreated ? "Docker VPS: Live" : "VPS Sent: Yes"}</span>
+                  <span class="badge-region">${item.region || "India (Mumbai) · ~25-45 ms"}</span>
+                  <div class="sent-email">Customer Email: ${item.email}</div>
+                  <div class="sent-meta">CPU: ${item.cpu} Cores · RAM: ${item.ram} GB · Storage: ${item.storage} GB NVMe</div>
+                  <div class="sent-meta">OS: ${item.os} · IP &amp; Port: ${item.ip}:${item.port}</div>
+                </div>
+                <div class="card-actions">
+                  <button type="button" class="btn-copy-vps" data-copy-vps="${encodeURIComponent(JSON.stringify(item))}">Copy</button>
+                  <button type="button" class="btn-delete" data-delete-id="${item.id}">Delete</button>
+                </div>
+              </div>
+            `
+          )
+          .join("");
+
+        sentContainer.querySelectorAll("[data-copy-vps]").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const obj = JSON.parse(decodeURIComponent(btn.getAttribute("data-copy-vps")));
+            const text = `${obj.email} | ${obj.region} | ${obj.cpu}C/${obj.ram}GB/${obj.storage}GB | ${obj.os} | ${obj.ip}:${obj.port}`;
+            if (navigator.clipboard) await navigator.clipboard.writeText(text);
+            cfgMsg.textContent = "Copied VPS details for " + obj.email;
+          });
+        });
+
+        sentContainer.querySelectorAll("[data-delete-id]").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const id = btn.getAttribute("data-delete-id");
+            await apiCall("/api/vps/delete", "POST", { id });
+            const next = readJson(KEYS.sentVps, []).filter((x) => x.id !== id);
+            writeJson(KEYS.sentVps, next);
+            renderSentVps();
+          });
+        });
+      }
+
+      if (sentFilterInput) sentFilterInput.addEventListener("input", renderSentVps);
+
+      vpsForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = cfgEmail.value.trim().toLowerCase();
+        if (!email) return;
+
+        const payload = {
+          email,
+          region: cfgCountryPing.value,
+          cpu: cfgCpu.value.trim() || "2",
+          ram: cfgRam.value.trim() || "4",
+          storage: cfgStorage.value.trim() || "40",
+          os: cfgOs.value.trim() || "Ubuntu 24.04 LTS",
+          ip: cfgIp.value.trim() || "198.51.100.24",
+          port: cfgPort.value.trim() || "25565"
+        };
+
+        const remote = await apiCall("/api/vps/create", "POST", payload);
+        const entry = remote && remote.ok ? remote.vps : { id: "vps-" + Date.now(), ...payload, status: "Running" };
+
+        recordLocalUser(email, email.split("@")[0]);
+        const list = readJson(KEYS.sentVps, []);
+        list.unshift(entry);
+        writeJson(KEYS.sentVps, list);
+        renderSentVps();
+
+        cfgMsg.textContent = entry.realDockerCreated
+          ? `Real Docker VPS created & assigned to ${email}`
+          : `VPS assigned to ${email} (${entry.region})`;
+        cfgEmail.value = "";
+      });
+
+      openEmailsBtn.addEventListener("click", async () => {
+        const remote = await apiCall("/api/users", "GET");
+        const arr = remote && remote.ok ? remote.users : readJson(KEYS.signedUsers, []);
+        if (!arr.length) {
+          emailsModalList.innerHTML = '<div class="panel-email">No signed-in emails yet.</div>';
+        } else {
+          emailsModalList.innerHTML = arr
+            .map(
+              (u, idx) => `
+                <div class="email-row">
+                  <span><strong>${idx + 1}.</strong> ${u.email} <span style="color:#64748b;">(${u.username})</span></span>
+                  <button type="button" class="btn-use" data-pick="${u.email}">Use Email</button>
+                </div>
+              `
+            )
+            .join("");
+
+          emailsModalList.querySelectorAll("[data-pick]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              cfgEmail.value = btn.getAttribute("data-pick");
+              emailsModal.classList.remove("open");
+            });
+          });
+        }
+        emailsModal.classList.add("open");
+      });
+
+      closeEmailsBtn.addEventListener("click", () => emailsModal.classList.remove("open"));
+      showAuthView();
+    })();
+  </script>
+</body>
+</html>
